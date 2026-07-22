@@ -111,10 +111,11 @@ class HomeFeature {
 
 final List<HomeFeature> _defaultFeatures = [
   HomeFeature(
-    title: "Kasbon",
-    icon: Icons.account_balance_wallet_outlined,
+    title: "Permohonan",
+    icon: Icons.person_outlined,
     color: Colors.green,
     badge: 2,
+    onTap: () {},
   ),
   HomeFeature(
     title: "Pengeluaran",

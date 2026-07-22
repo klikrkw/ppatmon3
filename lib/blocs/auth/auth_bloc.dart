@@ -22,8 +22,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(Authenticated(user, users));
         }
       } else {
-        await authRepository.logout();
         emit(Unauthenticated());
+        await authRepository.logout();
       }
     });
 

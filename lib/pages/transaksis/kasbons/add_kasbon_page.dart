@@ -33,10 +33,6 @@ class _AddKasbonPageState extends State<AddKasbonPage> {
 
   @override
   void initState() {
-    final userState = context.read<AuthBloc>().state;
-    if (userState is Authenticated) {
-      context.read<KasbonBloc>().add(NewKasbon(userId: userState.user.id));
-    }
     super.initState();
   }
 
@@ -142,8 +138,6 @@ class _AddKasbonPageState extends State<AddKasbonPage> {
                       label: "Total Kasbon",
                       value: formatRupiah(state.totalKasbon),
                     ),
-                    SizedBox(height: 16),
-                    _infoField(label: "Status", value: _selectedJenisKasbon),
 
                     SizedBox(height: 16),
                     DropdownButtonFormField<String>(

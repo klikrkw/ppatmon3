@@ -47,7 +47,7 @@ class _TranspermohonanPageState extends State<TranspermohonanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Trans Permohonan')),
+      appBar: AppBar(title: const Text('Daftar Permohonan')),
       body: Column(
         children: [
           // Search Bar

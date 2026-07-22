@@ -125,6 +125,7 @@ class ProsespermohonanBloc
       offset: state.items.length,
       limit: pageSize,
       query: state.query,
+      itemProsespermId: state.itemProsespermId,
       isTranspermohonanId: state.isTranspermohonanId,
     );
 

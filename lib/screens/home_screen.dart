@@ -3,12 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newklikrkw/blocs/auth/auth.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_bloc.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_event.dart';
+import 'package:newklikrkw/pages/biayaperms/biayaperm_list_page.dart';
+import 'package:newklikrkw/pages/lokasi_berkas_page.dart';
 import 'package:newklikrkw/pages/qr_reader_page.dart';
+import 'package:newklikrkw/pages/transaksis/prosespermohonans/prosespermohonan_page.dart';
 import 'package:newklikrkw/pages/transpermohonans/transpermohonan_menu_page.dart';
+import 'package:newklikrkw/pages/transpermohonans/transpermohonan_page.dart';
 import 'package:newklikrkw/routes.dart';
 import 'package:newklikrkw/screens/laporan_screen.dart';
 import 'package:newklikrkw/screens/profile_screen.dart';
 import 'package:newklikrkw/screens/transaksi_screen.dart';
+import 'package:newklikrkw/widgets/feature_grid_permohonan.dart';
 import 'package:newklikrkw/widgets/home/saldo_kasbon_card.dart';
 
 import '../../blocs/home/home_bloc.dart';
@@ -19,7 +24,6 @@ import '../../widgets/home/home_header.dart';
 import '../../widgets/home/quick_menu_grid.dart';
 import '../../widgets/home/home_banner_slider.dart';
 import '../../widgets/home/feature_search.dart';
-import '../../widgets/home/feature_grid.dart';
 import '../../widgets/home/home_bottom_navigation.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -210,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       const SizedBox(height: 24),
 
-                      FeatureGrid(),
+                      FeatureGridPermohonan(features: _buildFeatures(context)),
 
                       const SizedBox(height: 120),
                     ],
@@ -284,4 +288,51 @@ class CustomFabLocation extends FloatingActionButtonLocation {
 
     return Offset(fabX, fabY);
   }
+}
+
+List<HomeFeature> _buildFeatures(BuildContext context) {
+  return [
+    HomeFeature(
+      title: "Permohonan",
+      icon: Icons.person_outlined,
+      color: Colors.green,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => TranspermohonanPage()),
+        );
+      },
+    ),
+    HomeFeature(
+      title: "Proses",
+      icon: Icons.assignment_outlined,
+      color: Colors.orange,
+      badge: 5,
+      onTap: () {
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => ProsespermohonanPage()));
+      },
+    ),
+    HomeFeature(
+      title: "Biaya",
+      icon: Icons.receipt_long_outlined,
+      color: Colors.red,
+      onTap: () {
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => BiayapermListPage()));
+      },
+    ),
+    HomeFeature(
+      title: "Lokasi",
+      icon: Icons.pin_drop_outlined,
+      color: Colors.blue,
+      onTap: () {
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => LokasiBerkasPage()));
+      },
+    ),
+  ];
 }

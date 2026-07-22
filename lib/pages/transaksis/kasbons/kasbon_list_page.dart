@@ -520,10 +520,19 @@ class _KasbonListPageState extends State<KasbonListPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.pushNamed(context, MyRoute.addKasbon.name);
+      floatingActionButton: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state is Authenticated && state.user.isAdmin == true) {
+            return FloatingActionButton(
+              child: const Icon(Icons.add),
+              onPressed: () {
+                final user = state.user;
+                context.read<KasbonBloc>().add(NewKasbon(userId: user.id));
+                Navigator.pushNamed(context, MyRoute.addKasbon.name);
+              },
+            );
+          }
+          return const SizedBox();
         },
       ),
     );

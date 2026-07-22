@@ -43,15 +43,11 @@ class AuthRepository {
 
   Future<List<User>> getUsers() async {
     String? token = await getToken();
-    try {
-      if (token != null) {
-        final data = await _authService.getUsers(token);
-        return data.map((e) => User.fromJson(e)).toList();
-      }
-      return [];
-    } catch (e) {
-      throw Exception('Error : ${e.toString()}');
+    if (token != null) {
+      final data = await _authService.getUsers(token);
+      return data.map((e) => User.fromJson(e)).toList();
     }
+    return [];
   }
 
   Future<void> logout() async {

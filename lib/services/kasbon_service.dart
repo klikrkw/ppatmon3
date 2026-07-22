@@ -122,7 +122,7 @@ class KasbonService {
         ),
       );
       final dynamic data = response.data['data'];
-      return double.parse(data);
+      return double.parse(data.toString());
     } on DioException catch (e) {
       throw Exception(
         e.response?.data.toString() ??

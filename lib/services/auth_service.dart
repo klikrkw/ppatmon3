@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:newklikrkw/core/helpers/api_exception.dart';
 import 'package:newklikrkw/utils/dio.dart';
 
 class AuthService {
@@ -41,7 +42,7 @@ class AuthService {
       );
       return response.data;
     } on DioException catch (e) {
-      return e.response?.data;
+      throw ApiException(e.response?.data['message']);
       // throw Exception(
       //   e.response?.data['message'] ?? 'error getUser : gagal login to server',
       // );
@@ -59,9 +60,7 @@ class AuthService {
       );
       return response.data['data'];
     } on DioException catch (e) {
-      throw Exception(
-        e.response?.data['message'] ?? 'error getUser : gagal login to server',
-      );
+      throw ApiException(e.response?.data['message']);
     }
   }
 

@@ -20,7 +20,7 @@ class TransaksiScreen extends StatelessWidget {
                 title: "Permohonan",
                 children: [
                   _CustomListTile(
-                    title: "Transpermohonan",
+                    title: "Daftar Permohonan",
                     icon: CupertinoIcons.person_2_fill,
                     onTap: () {
                       Navigator.pushNamed(
@@ -69,14 +69,14 @@ class TransaksiScreen extends StatelessWidget {
                 children: [
                   _CustomListTile(
                     title: "Kasbon",
-                    icon: CupertinoIcons.device_phone_portrait,
+                    icon: Icons.shopping_bag_outlined,
                     onTap: () {
                       Navigator.pushNamed(context, MyRoute.kasbonList.name);
                     },
                   ),
                   _CustomListTile(
                     title: "Biaya Permohonan",
-                    icon: CupertinoIcons.device_phone_portrait,
+                    icon: Icons.payment_outlined,
                     onTap: () {
                       // Navigator.push(
                       //   context,
@@ -89,7 +89,7 @@ class TransaksiScreen extends StatelessWidget {
                   ),
                   _CustomListTile(
                     title: "Pengeluaran Biaya",
-                    icon: CupertinoIcons.money_pound,
+                    icon: Icons.payments_outlined,
                     onTap: () {
                       Navigator.pushNamed(
                         context,
@@ -99,7 +99,7 @@ class TransaksiScreen extends StatelessWidget {
                   ),
                   _CustomListTile(
                     title: "Pengeluaran Biaya Perm",
-                    icon: CupertinoIcons.money_dollar,
+                    icon: Icons.payments_outlined,
                     onTap: () {
                       Navigator.pushNamed(
                         context,
@@ -109,7 +109,7 @@ class TransaksiScreen extends StatelessWidget {
                   ),
                   _CustomListTile(
                     title: "Posting Jurnal",
-                    icon: CupertinoIcons.money_dollar,
+                    icon: Icons.account_balance_wallet_outlined,
                     onTap: () {
                       Navigator.pushNamed(context, MyRoute.postingjurnals.name);
                     },
