@@ -69,8 +69,6 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
-    <key>UIStatusBarHidden</key>
-    <false/>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
     <key>NSCameraUsageDescription</key> 
