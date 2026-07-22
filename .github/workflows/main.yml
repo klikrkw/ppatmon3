@@ -19,8 +19,11 @@ jobs:
       - run: pod repo update
         working-directory: ios
 
-      - run: flutter build ios --release --no-codesign
+      - name: Check Info.plist
+        run: |
+          cat ios/Runner/Info.plist
 
+      - run: flutter build ios --release --no-codesign
       - run: mkdir Payload
         working-directory: build/ios/iphoneos
 
