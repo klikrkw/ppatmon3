@@ -46,7 +46,7 @@ class DkeluarbiayaByItemService {
         "${date.day.toString().padLeft(2, '0')}";
   }
 
-  Future<List<Itemkegiatan>> getItemkegiatans() async {
+  Future<List<Itemkegiatan>> getItemkegiatans({String? grup}) async {
     try {
       String? token = await getToken();
       final response = await dio.get(
@@ -55,6 +55,7 @@ class DkeluarbiayaByItemService {
           responseType: ResponseType.json,
           headers: {'Authorization': 'Bearer $token'},
         ),
+        queryParameters: {"grup": ?grup},
       );
 
       final data = response.data["data"] as List;

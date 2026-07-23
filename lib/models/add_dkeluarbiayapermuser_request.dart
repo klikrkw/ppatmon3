@@ -1,4 +1,4 @@
-import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class AddDKeluarbiayapermuserRequest {
   final String transpermohonanId;
@@ -6,7 +6,7 @@ class AddDKeluarbiayapermuserRequest {
   final int itemkegiatanId;
   final double jumlahBiaya;
   final String ketBiaya;
-  final XFile? image;
+  final File? image;
 
   const AddDKeluarbiayapermuserRequest({
     required this.transpermohonanId,

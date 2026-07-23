@@ -23,7 +23,7 @@ class DkeluarbiayaByItemRepository {
     );
   }
 
-  Future<List<Itemkegiatan>> getItemkegiatans() {
-    return service.getItemkegiatans();
+  Future<List<Itemkegiatan>> getItemkegiatans({String? grup}) {
+    return service.getItemkegiatans(grup: grup);
   }
 }

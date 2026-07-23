@@ -2,6 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:newklikrkw/models/dkeluarbiayapermuser.dart';
 import 'package:newklikrkw/models/itemkegiatan.dart';
 import 'package:newklikrkw/models/keluarbiayapermuser.dart';
+import 'package:newklikrkw/models/validation_error.dart';
+
+const _unset = Object();
 
 class DkeluarbiayapermuserState extends Equatable {
   ///==============================
@@ -45,7 +48,7 @@ class DkeluarbiayapermuserState extends Equatable {
 
   final bool saveSuccess;
 
-  final Map<String, List<String>> validationErrors;
+  final ValidationError? validationError;
   final Keluarbiayapermuser? keluarbiayapermuser;
   final bool updatingStatus;
   final bool updateStatusSuccess;
@@ -70,7 +73,7 @@ class DkeluarbiayapermuserState extends Equatable {
     this.errorMessage,
     this.saving = false,
     this.saveSuccess = false,
-    this.validationErrors = const {},
+    this.validationError,
     this.keluarbiayapermuser,
     this.loadingKeluarbiayapermuser = false,
     this.updatingStatus = false,
@@ -98,7 +101,7 @@ class DkeluarbiayapermuserState extends Equatable {
     String? errorMessage,
     bool? saving,
     bool? saveSuccess,
-    Map<String, List<String>>? validationErrors,
+    Object? validationError,
     Keluarbiayapermuser? keluarbiayapermuser,
     bool? loadingKeluarbiayapermuser,
     bool? updatingStatus,
@@ -123,7 +126,9 @@ class DkeluarbiayapermuserState extends Equatable {
       errorMessage: errorMessage,
       saving: saving ?? this.saving,
       saveSuccess: saveSuccess ?? this.saveSuccess,
-      validationErrors: validationErrors ?? this.validationErrors,
+      validationError: identical(validationError, _unset)
+          ? this.validationError
+          : validationError as ValidationError?,
       keluarbiayapermuser: keluarbiayapermuser ?? this.keluarbiayapermuser,
       loadingKeluarbiayapermuser:
           loadingKeluarbiayapermuser ?? this.loadingKeluarbiayapermuser,
@@ -135,17 +140,20 @@ class DkeluarbiayapermuserState extends Equatable {
   }
 
   String? errorText(String field) {
-    if (!validationErrors.containsKey(field)) {
+    // if (!validationError!.errors.containsKey(field)) {
+    //   return null;
+    // }
+    if (validationError == null || validationError?.firstError(field) == null) {
       return null;
     }
 
-    final errors = validationErrors[field];
+    final errors = validationError!.firstError(field);
 
-    if (errors == null || errors.isEmpty) {
+    if (errors == null) {
       return null;
     }
 
-    return errors.first;
+    return errors;
   }
 
   @override
@@ -163,7 +171,7 @@ class DkeluarbiayapermuserState extends Equatable {
     errorMessage,
     saving,
     saveSuccess,
-    validationErrors,
+    validationError,
     keluarbiayapermuser,
     loadingKeluarbiayapermuser,
     updatingStatus,

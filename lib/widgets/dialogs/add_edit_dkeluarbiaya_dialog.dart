@@ -3,13 +3,14 @@ import 'dart:io';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:newklikrkw/blocs/dkeluarbiaya/dkeluarbiaya_bloc.dart';
 import 'package:newklikrkw/blocs/dkeluarbiaya/dkeluarbiaya_event.dart';
 import 'package:newklikrkw/blocs/dkeluarbiaya/dkeluarbiaya_state.dart';
 import 'package:newklikrkw/models/add_dkeluarbiaya_request.dart';
 import 'package:newklikrkw/models/dkeluarbiaya.dart';
 import 'package:newklikrkw/models/itemkegiatan.dart';
+import 'package:newklikrkw/widgets/image_upload_widget.dart';
 import 'package:newklikrkw/widgets/searchable_selection_dialog.dart';
 
 class AddEditDkeluarbiayaDialog extends StatefulWidget {
@@ -33,6 +34,11 @@ class _AddEditDkeluarbiayaDialogState extends State<AddEditDkeluarbiayaDialog> {
   final _formKey = GlobalKey<FormState>();
 
   final _jumlahBiayaController = TextEditingController();
+  double get jumlahBiaya {
+    final value = toNumericString(_jumlahBiayaController.text);
+
+    return double.tryParse(value) ?? 0;
+  }
 
   final _ketController = TextEditingController();
 
@@ -42,11 +48,11 @@ class _AddEditDkeluarbiayaDialogState extends State<AddEditDkeluarbiayaDialog> {
     symbol: '',
   );
 
-  final ImagePicker _picker = ImagePicker();
+  // final ImagePicker _picker = ImagePicker();
 
   Itemkegiatan? _selectedItemkegiatan;
 
-  XFile? _imageFile;
+  File? _imageFile;
 
   String? _imageUrl;
 
@@ -54,7 +60,12 @@ class _AddEditDkeluarbiayaDialogState extends State<AddEditDkeluarbiayaDialog> {
   void initState() {
     super.initState();
 
-    context.read<DkeluarbiayaBloc>().add(const LoadItemkegiatans());
+    final bloc = context.read<DkeluarbiayaBloc>();
+
+    bloc.add(const ResetValidationError());
+    bloc.add(const ResetSaveState());
+
+    bloc.add(const LoadItemkegiatans());
 
     if (widget.isEdit) {
       final item = widget.dkeluarbiaya!;
@@ -78,9 +89,11 @@ class _AddEditDkeluarbiayaDialogState extends State<AddEditDkeluarbiayaDialog> {
     super.dispose();
   }
 
-  double _parseCurrency(String value) {
-    return double.tryParse(value.replaceAll('.', '').replaceAll(',', '')) ?? 0;
-  }
+  // double _parseCurrency(String value) {
+  //   return double.tryParse(value.replaceAll('.', '').replaceAll(',', '')) ?? 0;
+  // }
+
+  DkeluarbiayaBloc get bloc => context.read<DkeluarbiayaBloc>();
 
   @override
   Widget build(BuildContext context) {
@@ -201,9 +214,11 @@ class _AddEditDkeluarbiayaDialogState extends State<AddEditDkeluarbiayaDialog> {
                                   setState(() {
                                     _selectedItemkegiatan = result;
                                   });
-                                  context.read<DkeluarbiayaBloc>().add(
-                                    const ResetValidationError(),
-                                  );
+                                  if (context.mounted) {
+                                    context.read<DkeluarbiayaBloc>().add(
+                                      const ResetValidationError(),
+                                    );
+                                  }
                                 },
                                 validator: (_) {
                                   if (_selectedItemkegiatan == null) {
@@ -214,32 +229,56 @@ class _AddEditDkeluarbiayaDialogState extends State<AddEditDkeluarbiayaDialog> {
                               ),
                             const SizedBox(height: 16),
 
-                            TextFormField(
-                              controller: _jumlahBiayaController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [_currencyFormatter],
-                              decoration: InputDecoration(
-                                labelText: "Jumlah Biaya",
-                                prefixText: "Rp ",
-                                prefixIcon: const Icon(Icons.payments),
-                                border: const OutlineInputBorder(),
-                                errorText: state.errorText("jumlah_biaya"),
-                              ),
-                              validator: (value) {
-                                final nominal = _parseCurrency(value ?? "");
+                            BlocBuilder<DkeluarbiayaBloc, DkeluarbiayaState>(
+                              buildWhen: (previous, current) =>
+                                  previous.validationError !=
+                                  current.validationError,
+                              builder: (context, state) {
+                                return TextFormField(
+                                  controller: _jumlahBiayaController,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                  inputFormatters: [
+                                    CurrencyInputFormatter(
+                                      thousandSeparator:
+                                          ThousandSeparator.Period,
+                                      mantissaLength: 0,
+                                      leadingSymbol: "Rp ",
+                                    ),
+                                  ],
+                                  decoration: InputDecoration(
+                                    labelText: "Jumlah",
+                                    prefixIcon: const Icon(Icons.payments),
+                                    border: const OutlineInputBorder(),
+                                    errorText: state.validationError
+                                        ?.firstError("jumlah_biaya"),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Jumlah wajib diisi";
+                                    }
 
-                                if (nominal <= 0) {
-                                  return "Jumlah biaya harus diisi";
-                                }
+                                    final amount = toNumericString(value);
 
-                                return null;
-                              },
-                              onChanged: (_) {
-                                context.read<DkeluarbiayaBloc>().add(
-                                  const ResetValidationError(),
+                                    if (double.tryParse(amount) == null) {
+                                      return "Jumlah tidak valid";
+                                    }
+
+                                    if (double.parse(amount) <= 0) {
+                                      return "Jumlah harus lebih dari 0";
+                                    }
+
+                                    return null;
+                                  },
+                                  onChanged: (_) {
+                                    bloc.add(const ResetValidationError());
+                                  },
                                 );
                               },
                             ),
+
                             const SizedBox(height: 16),
                             TextFormField(
                               controller: _ketController,
@@ -269,95 +308,156 @@ class _AddEditDkeluarbiayaDialogState extends State<AddEditDkeluarbiayaDialog> {
                               },
                             ),
 
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Foto Bukti",
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleMedium,
-                                ),
+                            // Column(
+                            //   crossAxisAlignment: CrossAxisAlignment.start,
+                            //   children: [
+                            //     Text(
+                            //       "Foto Bukti",
+                            //       style: Theme.of(
+                            //         context,
+                            //       ).textTheme.titleMedium,
+                            //     ),
 
-                                const SizedBox(height: 12),
+                            //     const SizedBox(height: 12),
 
-                                Center(
-                                  child: GestureDetector(
-                                    onTap: _showImagePicker,
-                                    child: Container(
-                                      width: 180,
-                                      height: 180,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey.shade400,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      clipBehavior: Clip.antiAlias,
-                                      child: _buildImagePreview(),
-                                    ),
-                                  ),
-                                ),
+                            //     Center(
+                            //       child: GestureDetector(
+                            //         onTap: _showImagePicker,
+                            //         child: Container(
+                            //           width: 180,
+                            //           height: 180,
+                            //           decoration: BoxDecoration(
+                            //             border: Border.all(
+                            //               color: Colors.grey.shade400,
+                            //             ),
+                            //             borderRadius: BorderRadius.circular(12),
+                            //           ),
+                            //           clipBehavior: Clip.antiAlias,
+                            //           child: _buildImagePreview(),
+                            //         ),
+                            //       ),
+                            //     ),
 
-                                if (state.errorText("image") != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: Text(
-                                      state.errorText("image")!,
-                                      style: const TextStyle(color: Colors.red),
-                                    ),
-                                  ),
+                            //     if (state.errorText("image") != null)
+                            //       Padding(
+                            //         padding: const EdgeInsets.only(top: 8),
+                            //         child: Text(
+                            //           state.errorText("image")!,
+                            //           style: const TextStyle(color: Colors.red),
+                            //         ),
+                            //       ),
 
-                                const SizedBox(height: 12),
+                            //     const SizedBox(height: 12),
 
-                                Row(
+                            //     Row(
+                            //       children: [
+                            //         Expanded(
+                            //           child: OutlinedButton.icon(
+                            //             onPressed: () =>
+                            //                 _pickImage(ImageSource.camera),
+                            //             icon: const Icon(Icons.camera_alt),
+                            //             label: const Text("Kamera"),
+                            //           ),
+                            //         ),
+
+                            //         const SizedBox(width: 12),
+
+                            //         Expanded(
+                            //           child: OutlinedButton.icon(
+                            //             onPressed: () =>
+                            //                 _pickImage(ImageSource.gallery),
+                            //             icon: const Icon(Icons.photo),
+                            //             label: const Text("Galeri"),
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ),
+
+                            //     if (_imageFile != null || _imageUrl != null)
+                            //       Padding(
+                            //         padding: const EdgeInsets.only(top: 12),
+                            //         child: Center(
+                            //           child: TextButton.icon(
+                            //             onPressed: () {
+                            //               setState(() {
+                            //                 _imageFile = null;
+
+                            //                 _imageUrl = null;
+                            //               });
+                            //             },
+                            //             icon: const Icon(
+                            //               Icons.delete,
+                            //               color: Colors.red,
+                            //             ),
+                            //             label: const Text(
+                            //               "Hapus Gambar",
+                            //               style: TextStyle(color: Colors.red),
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //   ],
+                            // ),
+                            BlocBuilder<DkeluarbiayaBloc, DkeluarbiayaState>(
+                              buildWhen: (previous, current) =>
+                                  previous.validationError !=
+                                  current.validationError,
+                              builder: (context, state) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Expanded(
-                                      child: OutlinedButton.icon(
-                                        onPressed: () =>
-                                            _pickImage(ImageSource.camera),
-                                        icon: const Icon(Icons.camera_alt),
-                                        label: const Text("Kamera"),
-                                      ),
+                                    Text(
+                                      "Lampiran",
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleSmall,
                                     ),
 
-                                    const SizedBox(width: 12),
+                                    const SizedBox(height: 8),
 
-                                    Expanded(
-                                      child: OutlinedButton.icon(
-                                        onPressed: () =>
-                                            _pickImage(ImageSource.gallery),
-                                        icon: const Icon(Icons.photo),
-                                        label: const Text("Galeri"),
-                                      ),
+                                    ImageUploadWidget(
+                                      imageFile: _imageFile,
+                                      imageUrl: _imageUrl,
+                                      folderName: "dkeluarbiaya",
+                                      maxSizeInMB: 1,
+                                      onChanged: (file) {
+                                        setState(() {
+                                          _imageFile = file;
+                                        });
+
+                                        bloc.add(const ResetValidationError());
+                                      },
+                                      onRemove: () {
+                                        setState(() {
+                                          _imageFile = null;
+                                          _imageUrl = null;
+                                        });
+
+                                        bloc.add(const ResetValidationError());
+                                      },
                                     ),
+
+                                    if (state.validationError?.firstError(
+                                          "image",
+                                        ) !=
+                                        null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 6),
+                                        child: Text(
+                                          state.validationError!.firstError(
+                                            "image",
+                                          )!,
+                                          style: TextStyle(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.error,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
                                   ],
-                                ),
-
-                                if (_imageFile != null || _imageUrl != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 12),
-                                    child: Center(
-                                      child: TextButton.icon(
-                                        onPressed: () {
-                                          setState(() {
-                                            _imageFile = null;
-
-                                            _imageUrl = null;
-                                          });
-                                        },
-                                        icon: const Icon(
-                                          Icons.delete,
-                                          color: Colors.red,
-                                        ),
-                                        label: const Text(
-                                          "Hapus Gambar",
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -391,81 +491,81 @@ class _AddEditDkeluarbiayaDialogState extends State<AddEditDkeluarbiayaDialog> {
     );
   }
 
-  Future<void> _pickImage(ImageSource source) async {
-    final file = await _picker.pickImage(source: source, imageQuality: 70);
+  // Future<void> _pickImage(ImageSource source) async {
+  //   final file = await _picker.pickImage(source: source, imageQuality: 70);
 
-    if (file == null) return;
+  //   if (file == null) return;
 
-    setState(() {
-      _imageFile = file;
+  //   setState(() {
+  //     _imageFile = file;
 
-      _imageUrl = null;
-    });
+  //     _imageUrl = null;
+  //   });
 
-    if (mounted) {
-      context.read<DkeluarbiayaBloc>().add(const ResetValidationError());
-    }
-  }
+  //   if (mounted) {
+  //     context.read<DkeluarbiayaBloc>().add(const ResetValidationError());
+  //   }
+  // }
 
-  void _showImagePicker() {
-    showModalBottomSheet(
-      context: context,
-      builder: (_) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text("Kamera"),
-                onTap: () {
-                  Navigator.pop(context);
+  // void _showImagePicker() {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (_) {
+  //       return SafeArea(
+  //         child: Wrap(
+  //           children: [
+  //             ListTile(
+  //               leading: const Icon(Icons.camera_alt),
+  //               title: const Text("Kamera"),
+  //               onTap: () {
+  //                 Navigator.pop(context);
 
-                  _pickImage(ImageSource.camera);
-                },
-              ),
+  //                 _pickImage(ImageSource.camera);
+  //               },
+  //             ),
 
-              ListTile(
-                leading: const Icon(Icons.photo),
-                title: const Text("Galeri"),
-                onTap: () {
-                  Navigator.pop(context);
+  //             ListTile(
+  //               leading: const Icon(Icons.photo),
+  //               title: const Text("Galeri"),
+  //               onTap: () {
+  //                 Navigator.pop(context);
 
-                  _pickImage(ImageSource.gallery);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  //                 _pickImage(ImageSource.gallery);
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
-  Widget _buildImagePreview() {
-    if (_imageFile != null) {
-      return Image.file(File(_imageFile!.path), fit: BoxFit.cover);
-    }
+  // Widget _buildImagePreview() {
+  //   if (_imageFile != null) {
+  //     return Image.file(File(_imageFile!.path), fit: BoxFit.cover);
+  //   }
 
-    if (_imageUrl != null && _imageUrl!.isNotEmpty) {
-      return Image.network(
-        _imageUrl!,
-        fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => const Icon(Icons.broken_image, size: 60),
-      );
-    }
+  //   if (_imageUrl != null && _imageUrl!.isNotEmpty) {
+  //     return Image.network(
+  //       _imageUrl!,
+  //       fit: BoxFit.cover,
+  //       errorBuilder: (_, _, _) => const Icon(Icons.broken_image, size: 60),
+  //     );
+  //   }
 
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.add_a_photo, size: 60),
+  //   return const Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Icon(Icons.add_a_photo, size: 60),
 
-          SizedBox(height: 8),
+  //         SizedBox(height: 8),
 
-          Text("Pilih Foto"),
-        ],
-      ),
-    );
-  }
+  //         Text("Pilih Foto"),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   void _submit() {
     FocusScope.of(context).unfocus();
@@ -480,13 +580,12 @@ class _AddEditDkeluarbiayaDialogState extends State<AddEditDkeluarbiayaDialog> {
       );
       return;
     }
-
     final request = AddDkeluarbiayaRequest(
       keluarbiayaId: widget.keluarbiayaId,
       itemkegiatanId: _selectedItemkegiatan!.id,
-      jumlahBiaya: _parseCurrency(_jumlahBiayaController.text),
+      jumlahBiaya: jumlahBiaya,
       ketBiaya: _ketController.text.trim(),
-      image: _imageFile,
+      image: _imageFile, // _imageFile,
     );
 
     if (widget.isEdit) {

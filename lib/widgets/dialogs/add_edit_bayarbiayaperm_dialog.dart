@@ -59,7 +59,7 @@ class _AddEditBayarbiayapermDialogState
 
   final _catatanController = TextEditingController();
 
-  DateTime _tanggal = DateTime.now();
+  // DateTime _tanggal = DateTime.now();
 
   Metodebayar? _selectedMetode;
 
@@ -90,7 +90,7 @@ class _AddEditBayarbiayapermDialogState
 
     if (isEdit) {
       final item = widget.bayarbiayaperm!;
-      _tanggal = item.tglBayarbiayaperm;
+      // _tanggal = item.tglBayarbiayaperm;
       _selectedMetode = item.metodebayar;
       _selectedRekening = item.rekening;
       _jumlahController.text = item.jumlahBayar.toStringAsFixed(0);
@@ -448,35 +448,35 @@ class _AddEditBayarbiayapermDialogState
     return state.validationError?.errors[field]?.first;
   }
 
-  Future<void> _pickTanggal() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: _tanggal,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-    );
+  // Future<void> _pickTanggal() async {
+  //   final date = await showDatePicker(
+  //     context: context,
+  //     initialDate: _tanggal,
+  //     firstDate: DateTime(2020),
+  //     lastDate: DateTime(2100),
+  //   );
 
-    if (date == null) return;
+  //   if (date == null) return;
 
-    if (!mounted) return;
+  //   if (!mounted) return;
 
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(_tanggal),
-    );
+  //   final time = await showTimePicker(
+  //     context: context,
+  //     initialTime: TimeOfDay.fromDateTime(_tanggal),
+  //   );
 
-    if (time == null) return;
+  //   if (time == null) return;
 
-    setState(() {
-      _tanggal = DateTime(
-        date.year,
-        date.month,
-        date.day,
-        time.hour,
-        time.minute,
-      );
-    });
-  }
+  //   setState(() {
+  //     _tanggal = DateTime(
+  //       date.year,
+  //       date.month,
+  //       date.day,
+  //       time.hour,
+  //       time.minute,
+  //     );
+  //   });
+  // }
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -539,7 +539,7 @@ class _AddEditBayarbiayapermDialogState
       return;
     }
 
-    final jumlah = _toDouble(_jumlahController);
+    // final jumlah = _toDouble(_jumlahController);
     final saldoAwal = _toDouble(_saldoAwalController);
     final saldoAkhir = _toDouble(_saldoAkhirController);
 
@@ -550,7 +550,7 @@ class _AddEditBayarbiayapermDialogState
       // tglBayarbiayaperm: _tanggal,
       metodebayarId: _selectedMetode!.id,
       rekeningId: _selectedRekening!.id,
-      jumlahBayar: jumlah,
+      jumlahBayar: _toDouble(_jumlahController),
       catatanBayarbiayaperm: _catatanController.text.trim(),
       imageFile: _imageFile,
       imageUrl: _imageUrl,

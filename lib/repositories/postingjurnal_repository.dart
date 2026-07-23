@@ -93,7 +93,6 @@ class PostingjurnalRepository {
 
       return Postingjurnal.fromJson(response.data['data']);
     } on DioException catch (e) {
-      print(e.response?.data);
       throw _handleError(e);
     }
   }

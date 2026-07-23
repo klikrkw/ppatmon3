@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:newklikrkw/core/helpers/api_validation_exception.dart';
-import 'package:newklikrkw/core/helpers/api_validation_ext_exception.dart';
 import 'package:newklikrkw/models/add_dkeluarbiayapermuser_request.dart';
 import 'package:newklikrkw/models/dkeluarbiayapermuser.dart';
 import 'package:newklikrkw/models/itemkegiatan.dart';
 import 'package:newklikrkw/models/keluarbiayapermuser.dart';
+import 'package:newklikrkw/models/validation_error.dart';
 import 'package:newklikrkw/utils/auth.dart';
 import 'package:newklikrkw/utils/utils.dart';
 
@@ -120,7 +120,7 @@ class DkeluarbiayapermuserService {
       if (request.image != null)
         "image": await MultipartFile.fromFile(
           request.image!.path,
-          filename: request.image!.name,
+          filename: request.image!.path.split('/').last,
         ),
     });
 
@@ -135,9 +135,8 @@ class DkeluarbiayapermuserService {
         ),
       );
     } on DioException catch (e) {
-      print(e.response?.data);
       if (e.response?.statusCode == 422) {
-        throw ApiValidationExtException.fromJson(e.response!.data);
+        throw ValidationError.fromJson(e.response?.data);
       }
       rethrow;
     }
@@ -159,7 +158,7 @@ class DkeluarbiayapermuserService {
       if (request.image != null)
         "image": await MultipartFile.fromFile(
           request.image!.path,
-          filename: request.image!.name,
+          filename: request.image!.path.split('/').last,
         ),
     });
 
@@ -167,7 +166,7 @@ class DkeluarbiayapermuserService {
       await dio.post("/dkeluarbiayapermusers/$id", data: formData);
     } on DioException catch (e) {
       if (e.response?.statusCode == 422) {
-        throw ApiValidationExtException.fromJson(e.response!.data);
+        throw ValidationError.fromJson(e.response?.data);
       }
 
       rethrow;

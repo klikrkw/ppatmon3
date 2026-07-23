@@ -2,6 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:newklikrkw/models/dkeluarbiaya.dart';
 import 'package:newklikrkw/models/itemkegiatan.dart';
 import 'package:newklikrkw/models/keluarbiaya.dart';
+import 'package:newklikrkw/models/validation_error.dart';
+
+const _unset = Object();
 
 class DkeluarbiayaState extends Equatable {
   ///==============================
@@ -41,15 +44,15 @@ class DkeluarbiayaState extends Equatable {
   final String? errorMessage;
 
   final bool saving;
-
   final bool saveSuccess;
 
-  final Map<String, List<String>> validationErrors;
+  final ValidationError? validationError;
+
   final Keluarbiaya? keluarbiaya;
+
   final bool updatingStatus;
   final bool updateStatusSuccess;
 
-  // deleting
   /// Delete
   final bool deleting;
   final bool deleteSuccess;
@@ -60,6 +63,7 @@ class DkeluarbiayaState extends Equatable {
     this.loading = false,
     this.loadingMore = false,
     this.refreshing = false,
+    this.loadingKeluarbiaya = false,
     this.hasMore = true,
     this.offset = 0,
     this.limit = 20,
@@ -68,9 +72,8 @@ class DkeluarbiayaState extends Equatable {
     this.errorMessage,
     this.saving = false,
     this.saveSuccess = false,
-    this.validationErrors = const {},
+    this.validationError,
     this.keluarbiaya,
-    this.loadingKeluarbiaya = false,
     this.updatingStatus = false,
     this.updateStatusSuccess = false,
     this.deleting = false,
@@ -87,6 +90,7 @@ class DkeluarbiayaState extends Equatable {
     bool? loading,
     bool? loadingMore,
     bool? refreshing,
+    bool? loadingKeluarbiaya,
     bool? hasMore,
     int? offset,
     int? limit,
@@ -95,9 +99,8 @@ class DkeluarbiayaState extends Equatable {
     String? errorMessage,
     bool? saving,
     bool? saveSuccess,
-    Map<String, List<String>>? validationErrors,
+    Object? validationError = _unset,
     Keluarbiaya? keluarbiaya,
-    bool? loadingKeluarbiaya,
     bool? updatingStatus,
     bool? updateStatusSuccess,
     bool? deleting,
@@ -109,6 +112,7 @@ class DkeluarbiayaState extends Equatable {
       loading: loading ?? this.loading,
       loadingMore: loadingMore ?? this.loadingMore,
       refreshing: refreshing ?? this.refreshing,
+      loadingKeluarbiaya: loadingKeluarbiaya ?? this.loadingKeluarbiaya,
       hasMore: hasMore ?? this.hasMore,
       offset: offset ?? this.offset,
       limit: limit ?? this.limit,
@@ -117,9 +121,10 @@ class DkeluarbiayaState extends Equatable {
       errorMessage: errorMessage,
       saving: saving ?? this.saving,
       saveSuccess: saveSuccess ?? this.saveSuccess,
-      validationErrors: validationErrors ?? this.validationErrors,
+      validationError: identical(validationError, _unset)
+          ? this.validationError
+          : validationError as ValidationError?,
       keluarbiaya: keluarbiaya ?? this.keluarbiaya,
-      loadingKeluarbiaya: loadingKeluarbiaya ?? this.loadingKeluarbiaya,
       updatingStatus: updatingStatus ?? this.updatingStatus,
       updateStatusSuccess: updateStatusSuccess ?? this.updateStatusSuccess,
       deleting: deleting ?? this.deleting,
@@ -128,17 +133,7 @@ class DkeluarbiayaState extends Equatable {
   }
 
   String? errorText(String field) {
-    if (!validationErrors.containsKey(field)) {
-      return null;
-    }
-
-    final errors = validationErrors[field];
-
-    if (errors == null || errors.isEmpty) {
-      return null;
-    }
-
-    return errors.first;
+    return validationError?.firstError(field);
   }
 
   @override
@@ -148,6 +143,7 @@ class DkeluarbiayaState extends Equatable {
     loading,
     loadingMore,
     refreshing,
+    loadingKeluarbiaya,
     hasMore,
     offset,
     limit,
@@ -156,9 +152,8 @@ class DkeluarbiayaState extends Equatable {
     errorMessage,
     saving,
     saveSuccess,
-    validationErrors,
+    validationError,
     keluarbiaya,
-    loadingKeluarbiaya,
     updatingStatus,
     updateStatusSuccess,
     deleting,

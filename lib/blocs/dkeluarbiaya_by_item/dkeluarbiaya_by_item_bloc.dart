@@ -234,7 +234,7 @@ class DkeluarbiayaByItemBloc
     Emitter<DkeluarbiayaByItemState> emit,
   ) async {
     try {
-      final items = await repository.getItemkegiatans();
+      final items = await repository.getItemkegiatans(grup: 'non_permohonan');
 
       emit(state.copyWith(itemkegiatans: items));
     } catch (_) {}

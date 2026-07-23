@@ -329,7 +329,6 @@ class KeluarbiayaBloc extends Bloc<KeluarbiayaEvent, KeluarbiayaState> {
         ),
       );
     } catch (e) {
-      print('error save : $e');
       emit(
         state.copyWith(saving: false, saveSuccess: false, error: e.toString()),
       );

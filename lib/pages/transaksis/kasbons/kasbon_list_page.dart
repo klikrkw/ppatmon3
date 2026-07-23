@@ -522,7 +522,7 @@ class _KasbonListPageState extends State<KasbonListPage> {
       ),
       floatingActionButton: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
-          if (state is Authenticated && state.user.isAdmin == true) {
+          if (state is Authenticated) {
             return FloatingActionButton(
               child: const Icon(Icons.add),
               onPressed: () {

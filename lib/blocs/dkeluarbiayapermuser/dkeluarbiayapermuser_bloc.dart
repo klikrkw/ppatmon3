@@ -5,6 +5,7 @@ import 'package:newklikrkw/blocs/dkeluarbiayapermuser/dkeluarbiayapermuser_event
 import 'package:newklikrkw/blocs/dkeluarbiayapermuser/dkeluarbiayapermuser_state.dart';
 import 'package:newklikrkw/core/helpers/api_validation_ext_exception.dart';
 import 'package:newklikrkw/models/dkeluarbiayapermuser.dart';
+import 'package:newklikrkw/models/validation_error.dart';
 import 'package:newklikrkw/repositories/dkeluarbiayapermuser_repository.dart';
 
 class DkeluarbiayapermuserBloc
@@ -162,7 +163,7 @@ class DkeluarbiayapermuserBloc
     Emitter<DkeluarbiayapermuserState> emit,
   ) async {
     emit(
-      state.copyWith(saving: true, saveSuccess: false, validationErrors: {}),
+      state.copyWith(saving: true, saveSuccess: false, validationError: null),
     );
 
     try {
@@ -172,8 +173,8 @@ class DkeluarbiayapermuserBloc
       );
 
       emit(state.copyWith(saving: false, saveSuccess: true));
-    } on ApiValidationExtException catch (e) {
-      emit(state.copyWith(saving: false, validationErrors: e.errors));
+    } on ValidationError catch (e) {
+      emit(state.copyWith(saving: false, validationError: e));
     } catch (e) {
       emit(state.copyWith(saving: false, errorMessage: e.toString()));
     }
@@ -184,15 +185,15 @@ class DkeluarbiayapermuserBloc
     Emitter<DkeluarbiayapermuserState> emit,
   ) async {
     emit(
-      state.copyWith(saving: true, saveSuccess: false, validationErrors: {}),
+      state.copyWith(saving: true, saveSuccess: false, validationError: null),
     );
 
     try {
       await repository.updateDkeluarbiayapermuser(event.id, event.request);
 
       emit(state.copyWith(saving: false, saveSuccess: true));
-    } on ApiValidationExtException catch (e) {
-      emit(state.copyWith(saving: false, validationErrors: e.errors));
+    } on ValidationError catch (e) {
+      emit(state.copyWith(saving: false, validationError: e));
     } catch (e) {
       emit(state.copyWith(saving: false, errorMessage: e.toString()));
     }
@@ -209,11 +210,11 @@ class DkeluarbiayapermuserBloc
     ResetValidationError event,
     Emitter<DkeluarbiayapermuserState> emit,
   ) {
-    emit(state.copyWith(validationErrors: {}));
+    emit(state.copyWith(validationError: null));
   }
 
   void _onClearForm(ClearForm event, Emitter<DkeluarbiayapermuserState> emit) {
-    emit(state.copyWith(saveSuccess: false, validationErrors: {}));
+    emit(state.copyWith(saveSuccess: false, validationError: null));
   }
 
   FutureOr<void> _onGetKeluarbiaya(
