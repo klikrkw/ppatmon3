@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_bloc.dart';
+import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_event.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_state.dart';
 import 'package:newklikrkw/pages/biayaperms/biayaperm_page.dart';
 import 'package:newklikrkw/pages/dkeluarbiayapermusers/dkeluarbiayapermuser_tp_list_page.dart';
@@ -8,6 +9,7 @@ import 'package:newklikrkw/pages/lapkeuangans/neraca_permohonan_page.dart';
 import 'package:newklikrkw/pages/lokasi_berkas_page.dart';
 import 'package:newklikrkw/pages/transaksis/prosespermohonans/prosespermohonan_page.dart';
 import 'package:newklikrkw/widgets/feature_grid_permohonan.dart';
+import 'package:newklikrkw/widgets/transpermohonans/add_edit_transpermohonan_dialog.dart';
 import 'package:newklikrkw/widgets/transpermohonans/card_transpermohonan.dart';
 
 class TranspermohonanMenuPage extends StatelessWidget {
@@ -16,6 +18,8 @@ class TranspermohonanMenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<TranspermohonanBloc, TranspermohonanState>(
+      listenWhen: (previous, current) =>
+          previous.transpermohonan != current.transpermohonan,
       listener: (context, state) {
         if (state.transpermohonan == null) {
           Navigator.of(context).pop();
@@ -126,6 +130,31 @@ List<HomeFeature> _buildFeatures(
             ),
           ),
         );
+      },
+    ),
+    HomeFeature(
+      title: "Edit",
+      icon: Icons.edit_outlined,
+      color: Colors.yellow.shade700,
+      onTap: () async {
+        context.read<TranspermohonanBloc>().add(
+          DetailTranspermohonan(state.transpermohonan!.id),
+        );
+        final result = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => AddEditTranspermohonanDialog(
+              transpermohonanId: state.transpermohonan!.id,
+            ),
+          ),
+        );
+
+        if (result == true && context.mounted) {
+          // context.read<TranspermohonanBloc>().add(
+          //   FilterQrCode(transpermohonanId: state.transpermohonan!.id),
+          // );
+        }
       },
     ),
   ];

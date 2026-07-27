@@ -27,13 +27,17 @@ import 'package:newklikrkw/repositories/berkas_lokasi_repository.dart';
 import 'package:newklikrkw/repositories/biayaperm_repository.dart';
 import 'package:newklikrkw/repositories/bukubesar_repository.dart';
 import 'package:newklikrkw/repositories/database_repository.dart';
+import 'package:newklikrkw/repositories/desa_repository.dart';
 import 'package:newklikrkw/repositories/home_repository.dart';
+import 'package:newklikrkw/repositories/jenishak_repository.dart';
+import 'package:newklikrkw/repositories/jenispermohonan_repository.dart';
 import 'package:newklikrkw/repositories/keluarbiaya_repository.dart';
 import 'package:newklikrkw/repositories/keluarbiayapermuser_repository.dart';
 import 'package:newklikrkw/repositories/neraca_repository.dart';
 import 'package:newklikrkw/repositories/postingjurnal_repository.dart';
 import 'package:newklikrkw/repositories/prosespermohonan_repository.dart';
 import 'package:newklikrkw/repositories/transpermohonan_repository.dart';
+import 'package:newklikrkw/repositories/user_repository.dart';
 import 'package:newklikrkw/routes.dart';
 import 'package:newklikrkw/screens/home_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -41,7 +45,10 @@ import 'package:newklikrkw/services/bayarbiayaperm.dart';
 import 'package:newklikrkw/services/berkas_lokasi_service.dart';
 import 'package:newklikrkw/services/biayaperm_service.dart';
 import 'package:newklikrkw/services/bukubesar_service.dart';
+import 'package:newklikrkw/services/desa_service.dart';
 import 'package:newklikrkw/services/home_service.dart';
+import 'package:newklikrkw/services/jenishak_service.dart';
+import 'package:newklikrkw/services/jenispermohonan_service.dart';
 import 'package:newklikrkw/services/kasbon_service.dart';
 import 'package:newklikrkw/services/keluarbiaya_service.dart';
 import 'package:newklikrkw/services/keluarbiayapermuser_service.dart';
@@ -49,6 +56,7 @@ import 'package:newklikrkw/services/neraca_service.dart';
 import 'package:newklikrkw/services/postingjurnal_service.dart';
 import 'package:newklikrkw/services/prosespermohonan_service.dart';
 import 'package:newklikrkw/services/trans_permohonan_service.dart';
+import 'package:newklikrkw/services/user_service.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -148,6 +156,10 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(
             create: (_) => TranspermohonanBloc(
               TranspermohonanRepository(widget.transpermohonanService),
+              JenishakRepository(service: JenishakService()),
+              JenispermohonanRepository(service: JenispermohonanService()),
+              UserRepository(service: UserService()),
+              DesaRepository(service: DesaService()),
             ),
           ),
           BlocProvider(

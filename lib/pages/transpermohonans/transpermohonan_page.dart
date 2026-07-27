@@ -7,6 +7,7 @@ import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_state.dart';
 import 'package:newklikrkw/models/transpermohonan.dart';
 import 'package:newklikrkw/pages/transpermohonans/transpermohonan_menu_page.dart';
 import 'package:newklikrkw/utils/common_utils.dart';
+import 'package:newklikrkw/widgets/transpermohonans/add_edit_transpermohonan_dialog.dart';
 
 class TranspermohonanPage extends StatefulWidget {
   const TranspermohonanPage({super.key});
@@ -48,6 +49,22 @@ class _TranspermohonanPageState extends State<TranspermohonanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Daftar Permohonan')),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () async {
+          final result = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(
+              fullscreenDialog: true,
+              builder: (_) => const AddEditTranspermohonanDialog(),
+            ),
+          );
+
+          if (result == true && context.mounted) {
+            // context.read<TranspermohonanBloc>().add(RefreshTranspermohonan());
+          }
+        },
+      ),
       body: Column(
         children: [
           // Search Bar
@@ -181,150 +198,170 @@ class _TranspermohonanPageState extends State<TranspermohonanPage> {
           ),
           SizedBox(height: 12),
 
-          BlocBuilder<TranspermohonanBloc, TranspermohonanState>(
-            builder: (context, state) {
-              if (state.loading && state.items.isEmpty) {
-                return Expanded(
-                  child: const Center(child: CircularProgressIndicator()),
+          BlocListener<TranspermohonanBloc, TranspermohonanState>(
+            listenWhen: (previous, current) =>
+                previous.saveSuccess != current.saveSuccess,
+            listener: (context, state) {
+              if (state.saveSuccess) {
+                context.read<TranspermohonanBloc>().add(
+                  RefreshTranspermohonan(),
                 );
               }
+              // TODO: implement listener
+            },
+            child: BlocBuilder<TranspermohonanBloc, TranspermohonanState>(
+              builder: (context, state) {
+                if (state.loading && state.items.isEmpty) {
+                  return Expanded(
+                    child: const Center(child: CircularProgressIndicator()),
+                  );
+                }
 
-              return Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    context.read<TranspermohonanBloc>().add(
-                      RefreshTranspermohonan(),
-                    );
-                  },
-                  child: ListView.builder(
-                    controller: _controller,
-                    itemCount:
-                        state.items.length + (state.hasReachedMax ? 0 : 1),
-                    itemBuilder: (context, index) {
-                      if (index >= state.items.length) {
-                        return const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      }
+                return Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<TranspermohonanBloc>().add(
+                        RefreshTranspermohonan(),
+                      );
+                    },
+                    child: ListView.builder(
+                      controller: _controller,
+                      itemCount:
+                          state.items.length + (state.hasReachedMax ? 0 : 1),
+                      itemBuilder: (context, index) {
+                        if (index >= state.items.length) {
+                          return const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
 
-                      final item = state.items[index];
+                        final item = state.items[index];
 
-                      return Card(
-                        child: ListTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                item.noDaftar,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              Text(
-                                item.tglDaftar,
-                                style: Theme.of(context).textTheme.titleSmall,
-                              ),
-                            ],
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    CommonUtils.truncate(item.namaPenerima, 28),
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleSmall,
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    item.jenisPermohonan,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall,
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    item.alasHak,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall,
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    CommonUtils.truncate(item.letakObyek, 20),
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall,
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    item.users.map((u) => u.name).join(', '),
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          trailing: BlocBuilder<AuthBloc, AuthState>(
-                            builder: (context, state) {
-                              if (state is Authenticated) {
-                                if (state.user.isAdmin == true) {
-                                  return IconButton(
+                        return Card(
+                          child: ListTile(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  item.noDaftar,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                ),
+                                Text(
+                                  item.tglDaftar,
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                              ],
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      CommonUtils.truncate(
+                                        item.namaPenerima,
+                                        28,
+                                      ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleSmall,
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      item.jenisPermohonan,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      item.alasHak,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      CommonUtils.truncate(item.letakObyek, 20),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      item.users.map((u) => u.name).join(', '),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            trailing: BlocBuilder<AuthBloc, AuthState>(
+                              builder: (context, state) {
+                                if (state is Authenticated) {
+                                  if (state.user.isAdmin == true) {
+                                    return IconButton(
+                                      color: item.active == true
+                                          ? Colors.green
+                                          : Colors.blueGrey,
+                                      icon: (item.active == true)
+                                          ? const Icon(Icons.check_box_outlined)
+                                          : const Icon(
+                                              Icons
+                                                  .check_box_outline_blank_rounded,
+                                            ),
+                                      onPressed: () =>
+                                          showStatusBottomSheet(context, item),
+                                    );
+                                  }
+                                  return Icon(
+                                    item.active == true
+                                        ? Icons.check_box_outlined
+                                        : Icons.check_box_outline_blank_rounded,
                                     color: item.active == true
                                         ? Colors.green
                                         : Colors.blueGrey,
-                                    icon: (item.active == true)
-                                        ? const Icon(Icons.check_box_outlined)
-                                        : const Icon(
-                                            Icons
-                                                .check_box_outline_blank_rounded,
-                                          ),
-                                    onPressed: () =>
-                                        showStatusBottomSheet(context, item),
                                   );
                                 }
-                                return Icon(
-                                  item.active == true
-                                      ? Icons.check_box_outlined
-                                      : Icons.check_box_outline_blank_rounded,
-                                  color: item.active == true
-                                      ? Colors.green
-                                      : Colors.blueGrey,
-                                );
-                              }
-                              return Container();
+                                return Container();
+                              },
+                            ),
+                            onTap: () {
+                              context.read<TranspermohonanBloc>().add(
+                                FilterQrCode(
+                                  transpermohonanId: item.id,
+                                  isTranspermohonanId: true,
+                                ),
+                              );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => TranspermohonanMenuPage(),
+                                ),
+                              );
                             },
                           ),
-                          onTap: () {
-                            context.read<TranspermohonanBloc>().add(
-                              FilterQrCode(transpermohonanId: item.id),
-                            );
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => TranspermohonanMenuPage(),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ],
       ),

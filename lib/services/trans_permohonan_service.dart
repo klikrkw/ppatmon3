@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
+import 'package:newklikrkw/core/helpers/dio_exception_parse.dart';
+import 'package:newklikrkw/models/requests/add_transpermohonan_request.dart';
 import 'package:newklikrkw/models/transpermohonan.dart';
+import 'package:newklikrkw/models/transpermohonan_model.dart';
 import 'package:newklikrkw/utils/auth.dart';
 import 'package:newklikrkw/utils/dio.dart';
 
@@ -77,5 +82,58 @@ class TranspermohonanService {
         responseType: ResponseType.json,
       ),
     );
+  }
+
+  Future<void> add(AddTranspermohonanRequest request) async {
+    try {
+      final token = await getToken();
+      await dio.post(
+        "/permohonans/add",
+        data: request.toJson(),
+        options: Options(
+          responseType: ResponseType.json,
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+      );
+    } on DioException catch (e) {
+      print(e.response?.data);
+      throw DioExceptionParser.parse(e);
+    }
+  }
+
+  Future<void> update(String id, AddTranspermohonanRequest request) async {
+    try {
+      final token = await getToken();
+      await dio.post(
+        "/permohonans/$id/update",
+        data: request.toJson(),
+        options: Options(
+          responseType: ResponseType.json,
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+      );
+    } on DioException catch (e) {
+      throw DioExceptionParser.parse(e);
+    }
+  }
+
+  Future<void> delete(String id) async {
+    await dio.delete("/transpermohonans/$id");
+  }
+
+  Future<TranspermohonanModel> detail(String id) async {
+    try {
+      final token = await getToken();
+      final response = await dio.get(
+        "/permohonans/transpermohonan/$id/show",
+        options: Options(
+          responseType: ResponseType.json,
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+      );
+      return TranspermohonanModel.fromJson(response.data["data"]);
+    } on DioException catch (e) {
+      throw DioExceptionParser.parse(e);
+    }
   }
 }

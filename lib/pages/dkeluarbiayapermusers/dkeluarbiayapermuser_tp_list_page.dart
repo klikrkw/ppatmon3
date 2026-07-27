@@ -6,10 +6,18 @@ import 'package:newklikrkw/blocs/dkeluarbiayapermuser/dkeluarbiayapermuser_state
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_bloc.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_event.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_state.dart';
+import 'package:newklikrkw/repositories/desa_repository.dart';
 import 'package:newklikrkw/repositories/dkeluarbiayapermuser_repository.dart';
+import 'package:newklikrkw/repositories/jenishak_repository.dart';
+import 'package:newklikrkw/repositories/jenispermohonan_repository.dart';
 import 'package:newklikrkw/repositories/transpermohonan_repository.dart';
+import 'package:newklikrkw/repositories/user_repository.dart';
+import 'package:newklikrkw/services/desa_service.dart';
 import 'package:newklikrkw/services/dkeluarbiayapermuser_service.dart';
+import 'package:newklikrkw/services/jenishak_service.dart';
+import 'package:newklikrkw/services/jenispermohonan_service.dart';
 import 'package:newklikrkw/services/trans_permohonan_service.dart';
+import 'package:newklikrkw/services/user_service.dart';
 import 'package:newklikrkw/utils/format.dart';
 import 'package:newklikrkw/widgets/dkeluarbiayapermuser_tp_list_widget.dart';
 
@@ -36,6 +44,10 @@ class DkeluarbiayapermuserTpListPage extends StatelessWidget {
           create: (context) =>
               TranspermohonanBloc(
                 TranspermohonanRepository(TranspermohonanService()),
+                JenishakRepository(service: JenishakService()),
+                JenispermohonanRepository(service: JenispermohonanService()),
+                UserRepository(service: UserService()),
+                DesaRepository(service: DesaService()),
               )..add(
                 FilterTranspermohonanId(
                   transpermohonanId: transpermohonanId,
