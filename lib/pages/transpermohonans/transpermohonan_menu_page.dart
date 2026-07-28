@@ -19,7 +19,8 @@ class TranspermohonanMenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<TranspermohonanBloc, TranspermohonanState>(
       listenWhen: (previous, current) =>
-          previous.transpermohonan != current.transpermohonan,
+          previous.transpermohonan != current.transpermohonan ||
+          previous.saveSuccess != current.saveSuccess,
       listener: (context, state) {
         // if (state.transpermohonan == null) {
         //   Navigator.of(context).pop();

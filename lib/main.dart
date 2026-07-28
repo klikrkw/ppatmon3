@@ -7,8 +7,8 @@ import 'package:newklikrkw/blocs/berkas_lokasi/berkas_lokasi_bloc.dart';
 import 'package:newklikrkw/blocs/biayaperm/biayaperm_bloc.dart';
 import 'package:newklikrkw/blocs/bukubesar/bukubesar_bloc.dart';
 import 'package:newklikrkw/blocs/home/home_bloc.dart';
-import 'package:newklikrkw/blocs/item/item_bloc.dart';
-import 'package:newklikrkw/blocs/item/item_event.dart';
+// import 'package:newklikrkw/blocs/item/item_bloc.dart';
+// import 'package:newklikrkw/blocs/item/item_event.dart';
 import 'package:newklikrkw/blocs/kasbon/kasbon_bloc.dart';
 import 'package:newklikrkw/blocs/keluarbiaya/keluarbiaya_bloc.dart';
 import 'package:newklikrkw/blocs/keluarbiayapermuser/keluarbiayapermuser_bloc.dart';
@@ -19,14 +19,14 @@ import 'package:newklikrkw/blocs/theme/theme_bloc.dart';
 import 'package:newklikrkw/blocs/theme/theme_state.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_bloc.dart';
 import 'package:newklikrkw/core/theme/app_theme.dart';
-import 'package:newklikrkw/models/product_model.dart';
+// import 'package:newklikrkw/models/product_model.dart';
 import 'package:newklikrkw/pages/login_page.dart';
 import 'package:newklikrkw/repositories/auth_repository.dart';
 import 'package:newklikrkw/repositories/bayarbiayaperm_repository.dart';
 import 'package:newklikrkw/repositories/berkas_lokasi_repository.dart';
 import 'package:newklikrkw/repositories/biayaperm_repository.dart';
 import 'package:newklikrkw/repositories/bukubesar_repository.dart';
-import 'package:newklikrkw/repositories/database_repository.dart';
+// import 'package:newklikrkw/repositories/database_repository.dart';
 import 'package:newklikrkw/repositories/desa_repository.dart';
 import 'package:newklikrkw/repositories/home_repository.dart';
 import 'package:newklikrkw/repositories/jenishak_repository.dart';
@@ -140,120 +140,120 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
+    // return MultiRepositoryProvider(
+    //   providers: [
+    //     // RepositoryProvider<DatabaseRepository<Product>>(
+    //     //   create: (context) => ProductRepository(),
+    //     // ),
+    //   ],
+    //   child:
+    return MultiBlocProvider(
       providers: [
-        RepositoryProvider<DatabaseRepository<Product>>(
-          create: (context) => ProductRepository(),
+        // BlocProvider<ItemBloc<Product>>(
+        //   create: (context) => ItemBloc<Product>(
+        //     repository: context.read<DatabaseRepository<Product>>(),
+        //   )..add(FetchItemsEvent()), // Pemicu fetch data pertama kali
+        // ),
+        BlocProvider(
+          create: (_) => TranspermohonanBloc(
+            TranspermohonanRepository(widget.transpermohonanService),
+            JenishakRepository(service: JenishakService()),
+            JenispermohonanRepository(service: JenispermohonanService()),
+            UserRepository(service: UserService()),
+            DesaRepository(service: DesaService()),
+          ),
         ),
+        BlocProvider(
+          create: (_) => ProsespermohonanBloc(
+            ProsespermohonanRepository(widget.prosespermohonanService),
+          ),
+        ),
+        BlocProvider(
+          create: (_) =>
+              BiayapermBloc(BiayapermRepository(widget.biayapermService)),
+        ),
+        BlocProvider(
+          create: (_) => BayarbiayapermBloc(
+            repository: BayarbiayapermRepository(
+              service: widget.bayarbiayapermService,
+            ),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => KeluarbiayaBloc(
+            repository: KeluarbiayaRepository(widget.keluarbiayaService),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => KeluarbiayapermuserBloc(
+            repository: KeluarbiayapermuserRepository(
+              widget.keluarbiayapermuserService,
+            ),
+          ),
+        ),
+        BlocProvider(
+          create: (context) =>
+              AuthBloc(authRepository: widget.authRepository)
+                ..add(AppStarted()),
+        ),
+        BlocProvider(create: (_) => ThemeBloc()),
+        BlocProvider(
+          create: (context) =>
+              KasbonBloc(kasbonService: widget.kasbonService)..add(NewKasbon()),
+        ),
+        BlocProvider(
+          create: (_) => BerkasLokasiBloc(widget.berkasLokasiRepository),
+        ),
+        BlocProvider(
+          create: (_) => BukubesarBloc(
+            repository: BukubesarRepository(service: BukubesarService()),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => NeracaBloc(
+            repository: NeracaRepository(service: NeracaService()),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => PostingjurnalBloc(
+            repository: PostingjurnalRepository(
+              service: PostingjurnalService(),
+            ),
+          ),
+        ),
+        BlocProvider(create: (_) => HomeBloc(HomeRepository(HomeService()))),
       ],
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<ItemBloc<Product>>(
-            create: (context) => ItemBloc<Product>(
-              repository: context.read<DatabaseRepository<Product>>(),
-            )..add(FetchItemsEvent()), // Pemicu fetch data pertama kali
-          ),
-          BlocProvider(
-            create: (_) => TranspermohonanBloc(
-              TranspermohonanRepository(widget.transpermohonanService),
-              JenishakRepository(service: JenishakService()),
-              JenispermohonanRepository(service: JenispermohonanService()),
-              UserRepository(service: UserService()),
-              DesaRepository(service: DesaService()),
-            ),
-          ),
-          BlocProvider(
-            create: (_) => ProsespermohonanBloc(
-              ProsespermohonanRepository(widget.prosespermohonanService),
-            ),
-          ),
-          BlocProvider(
-            create: (_) =>
-                BiayapermBloc(BiayapermRepository(widget.biayapermService)),
-          ),
-          BlocProvider(
-            create: (_) => BayarbiayapermBloc(
-              repository: BayarbiayapermRepository(
-                service: widget.bayarbiayapermService,
-              ),
-            ),
-          ),
-          BlocProvider(
-            create: (_) => KeluarbiayaBloc(
-              repository: KeluarbiayaRepository(widget.keluarbiayaService),
-            ),
-          ),
-          BlocProvider(
-            create: (_) => KeluarbiayapermuserBloc(
-              repository: KeluarbiayapermuserRepository(
-                widget.keluarbiayapermuserService,
-              ),
-            ),
-          ),
-          BlocProvider(
-            create: (context) =>
-                AuthBloc(authRepository: widget.authRepository)
-                  ..add(AppStarted()),
-          ),
-          BlocProvider(create: (_) => ThemeBloc()),
-          BlocProvider(
-            create: (context) =>
-                KasbonBloc(kasbonService: widget.kasbonService)
-                  ..add(NewKasbon()),
-          ),
-          BlocProvider(
-            create: (_) => BerkasLokasiBloc(widget.berkasLokasiRepository),
-          ),
-          BlocProvider(
-            create: (_) => BukubesarBloc(
-              repository: BukubesarRepository(service: BukubesarService()),
-            ),
-          ),
-          BlocProvider(
-            create: (_) => NeracaBloc(
-              repository: NeracaRepository(service: NeracaService()),
-            ),
-          ),
-          BlocProvider(
-            create: (_) => PostingjurnalBloc(
-              repository: PostingjurnalRepository(
-                service: PostingjurnalService(),
-              ),
-            ),
-          ),
-          BlocProvider(create: (_) => HomeBloc(HomeRepository(HomeService()))),
-        ],
-        child: BlocBuilder<ThemeBloc, ThemeState>(
-          builder: (context, state) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: 'Monitoring App',
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: state.themeMode,
-              routes: routes,
-              home: BlocBuilder<AuthBloc, AuthState>(
-                builder: (context, state) {
-                  if (state is Authenticated) {
-                    return const HomeScreen();
-                  }
-                  if (state is Unauthenticated || state is AuthFailure) {
-                    return LoginPage();
-                  }
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Monitoring App',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: state.themeMode,
+            routes: routes,
+            home: BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                if (state is Authenticated) {
+                  return const HomeScreen();
+                }
+                if (state is Unauthenticated || state is AuthFailure) {
+                  return LoginPage();
+                }
 
-                  return const Scaffold(
-                    body: Center(child: CircularProgressIndicator()),
-                  );
-                },
-              ),
-              supportedLocales: [
-                const Locale('id', ''), // Indonesia
-                const Locale('en', ''), // Inggris
-              ],
-            );
-          },
-        ),
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              },
+            ),
+            supportedLocales: [
+              const Locale('id', ''), // Indonesia
+              const Locale('en', ''), // Inggris
+            ],
+          );
+        },
       ),
     );
+    // );
   }
 }
