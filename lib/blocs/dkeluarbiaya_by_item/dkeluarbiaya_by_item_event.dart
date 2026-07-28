@@ -75,3 +75,12 @@ class ChangeCustomDateRange extends DkeluarbiayaByItemEvent {
   @override
   List<Object?> get props => [startDate, endDate];
 }
+
+class SearchKeteranganChanged extends DkeluarbiayaByItemEvent {
+  final String keyword;
+
+  const SearchKeteranganChanged(this.keyword);
+
+  @override
+  List<Object?> get props => [keyword];
+}

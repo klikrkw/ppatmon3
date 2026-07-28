@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:newklikrkw/pages/test/test_page.dart';
 import 'package:newklikrkw/routes.dart';
 
 class LaporanScreen extends StatelessWidget {
@@ -52,18 +51,6 @@ class LaporanScreen extends StatelessWidget {
                     icon: Icons.balance_rounded,
                     onTap: () {
                       Navigator.pushNamed(context, MyRoute.neraca.name);
-                    },
-                  ),
-                  _CustomListTile(
-                    title: "Daftar Desa",
-                    icon: Icons.balance_rounded,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const TestPage(),
-                        ),
-                      );
                     },
                   ),
                 ],

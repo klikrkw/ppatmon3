@@ -27,8 +27,12 @@ class _TranspermohonanPageState extends State<TranspermohonanPage> {
     final currentState = context.read<AuthBloc>().state;
     if (currentState is Authenticated) {
       _userId = currentState.user.id;
+      if (_userId != null) {
+        context.read<TranspermohonanBloc>().add(
+          LoadTranspermohonan(userId: _userId, active: true, query: ''),
+        );
+      }
     }
-    context.read<TranspermohonanBloc>().add(FilterUserId(_userId));
 
     _controller.addListener(() {
       if (_controller.position.pixels >

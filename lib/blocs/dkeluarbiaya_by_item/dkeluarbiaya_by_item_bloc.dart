@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:newklikrkw/blocs/bayarbiayaperm/bayarbiayaperm_bloc.dart';
 
 import 'package:newklikrkw/blocs/dkeluarbiaya_by_item/dkeluarbiaya_by_item_event.dart';
 import 'package:newklikrkw/blocs/dkeluarbiaya_by_item/dkeluarbiaya_by_item_state.dart';
@@ -31,6 +32,10 @@ class DkeluarbiayaByItemBloc
     on<ResetFilterDkeluarbiayasByItem>(_onResetFilter);
     on<LoadItemkegiatans>(_onLoadItemkegiatans);
     on<ChangeCustomDateRange>(_onChangeCustomRange);
+    on<SearchKeteranganChanged>(
+      _onSearchChanged,
+      transformer: debounceRestartable(const Duration(milliseconds: 500)),
+    );
   }
 
   ///==================================================
@@ -44,6 +49,7 @@ class DkeluarbiayaByItemBloc
       offset: offset,
       limit: state.limit,
       itemkegiatanId: state.selectedItemkegiatanId,
+      keyword: state.keyword.isEmpty ? null : state.keyword,
       startDate: range.$1,
       endDate: range.$2,
     );
@@ -96,12 +102,38 @@ class DkeluarbiayaByItemBloc
   /// Reset Pagination
   ///==================================================
 
-  DkeluarbiayaByItemState _resetPagination() {
-    return state.copyWith(items: const [], offset: 0, hasMore: true);
-  }
+  // DkeluarbiayaByItemState _resetPagination() {
+  //   return state.copyWith(items: const [], offset: 0, hasMore: true);
+  // }
 
+  // Future<void> _reload(Emitter<DkeluarbiayaByItemState> emit) async {
+  //   emit(_resetPagination().copyWith(loading: true, clearError: true));
+
+  //   try {
+  //     final result = await _fetchData(offset: 0);
+
+  //     emit(
+  //       state.copyWith(
+  //         loading: false,
+  //         items: result.items,
+  //         offset: result.items.length,
+  //         hasMore: result.pagination.hasMore,
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     emit(state.copyWith(loading: false, errorMessage: e.toString()));
+  //   }
+  // }
   Future<void> _reload(Emitter<DkeluarbiayaByItemState> emit) async {
-    emit(_resetPagination().copyWith(loading: true, clearError: true));
+    emit(
+      state.copyWith(
+        loading: true,
+        clearError: true,
+        items: const [],
+        offset: 0,
+        hasMore: true,
+      ),
+    );
 
     try {
       final result = await _fetchData(offset: 0);
@@ -109,15 +141,25 @@ class DkeluarbiayaByItemBloc
       emit(
         state.copyWith(
           loading: false,
+          refreshing: false,
+          loadingMore: false,
           items: result.items,
           offset: result.items.length,
           hasMore: result.pagination.hasMore,
         ),
       );
     } catch (e) {
-      emit(state.copyWith(loading: false, errorMessage: e.toString()));
+      emit(
+        state.copyWith(
+          loading: false,
+          refreshing: false,
+          loadingMore: false,
+          errorMessage: e.toString(),
+        ),
+      );
     }
   }
+
   //==================================================
   // Handler
   // Dibuat pada Bagian 3C-2 dan 3C-3
@@ -134,22 +176,9 @@ class DkeluarbiayaByItemBloc
     RefreshDkeluarbiayasByItem event,
     Emitter<DkeluarbiayaByItemState> emit,
   ) async {
-    emit(state.copyWith(refreshing: true, clearError: true));
+    emit(state.copyWith(refreshing: true));
 
-    try {
-      final result = await _fetchData(offset: 0);
-
-      emit(
-        state.copyWith(
-          refreshing: false,
-          items: result.items,
-          offset: result.items.length,
-          hasMore: result.pagination.hasMore,
-        ),
-      );
-    } catch (e) {
-      emit(state.copyWith(refreshing: false, errorMessage: e.toString()));
-    }
+    await _reload(emit);
   }
 
   Future<void> _onLoadMore(
@@ -219,6 +248,7 @@ class DkeluarbiayaByItemBloc
   ) async {
     emit(
       state.copyWith(
+        keyword: '',
         selectedRange: DateFilterRange.today,
         selectedDate: DateTime.now(),
         clearSelectedItem: true,
@@ -251,6 +281,15 @@ class DkeluarbiayaByItemBloc
         endDate: event.endDate,
       ),
     );
+    await _reload(emit);
+  }
+
+  Future<void> _onSearchChanged(
+    SearchKeteranganChanged event,
+    Emitter<DkeluarbiayaByItemState> emit,
+  ) async {
+    emit(state.copyWith(keyword: event.keyword));
+
     await _reload(emit);
   }
 }

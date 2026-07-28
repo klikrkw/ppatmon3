@@ -8,7 +8,15 @@ abstract class TranspermohonanEvent extends Equatable {
 
 class LoadTranspermohonan extends TranspermohonanEvent {
   final int? userId;
-  LoadTranspermohonan({this.userId});
+  final String? transpermohonanId;
+  final String? query;
+  final bool? active;
+  LoadTranspermohonan({
+    this.userId,
+    this.transpermohonanId,
+    this.query,
+    this.active,
+  });
 }
 
 class LoadMoreTranspermohonan extends TranspermohonanEvent {}

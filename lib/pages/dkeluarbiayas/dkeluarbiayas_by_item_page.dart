@@ -41,6 +41,7 @@ class _Body extends StatefulWidget {
 
 class _BodyState extends State<_Body> {
   final ScrollController _scrollController = ScrollController();
+  // final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -53,6 +54,7 @@ class _BodyState extends State<_Body> {
 
   @override
   void dispose() {
+    // _searchController.dispose();
     _scrollController
       ..removeListener(_onScroll)
       ..dispose();
@@ -93,6 +95,36 @@ class _BodyState extends State<_Body> {
             children: [
               DkeluarbiayaByItemFilter(itemkegiatans: state.itemkegiatans),
 
+              // Padding(
+              //   padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              //   child: TextField(
+              //     controller: _searchController,
+              //     decoration: InputDecoration(
+              //       hintText: "Cari berdasarkan keterangan...",
+              //       prefixIcon: const Icon(Icons.search),
+              //       suffixIcon: state.keyword.isNotEmpty
+              //           ? IconButton(
+              //               icon: const Icon(Icons.clear),
+              //               onPressed: () {
+              //                 _searchController.clear();
+
+              //                 context.read<DkeluarbiayaByItemBloc>().add(
+              //                   const SearchKeteranganChanged(""),
+              //                 );
+              //               },
+              //             )
+              //           : null,
+              //       border: OutlineInputBorder(
+              //         borderRadius: BorderRadius.circular(12),
+              //       ),
+              //     ),
+              //     onChanged: (value) {
+              //       context.read<DkeluarbiayaByItemBloc>().add(
+              //         SearchKeteranganChanged(value),
+              //       );
+              //     },
+              //   ),
+              // ),
               const DkeluarbiayaByItemSummary(),
 
               Expanded(

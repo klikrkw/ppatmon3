@@ -12,6 +12,7 @@ class DkeluarbiayaByItemService {
     int? itemkegiatanId,
     DateTime? startDate,
     DateTime? endDate,
+    String? keyword,
   }) async {
     try {
       String? token = await getToken();
@@ -22,6 +23,7 @@ class DkeluarbiayaByItemService {
           "limit": limit,
 
           "itemkegiatan_id": ?itemkegiatanId,
+          "keyword": ?keyword,
 
           if (startDate != null) "start_date": _formatDate(startDate),
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:intl/intl.dart';
-import 'package:newklikrkw/pages/transpermohonans/transpermohonan_menu_page.dart';
+import 'package:newklikrkw/blocs/auth/auth.dart';
 
 import '../../blocs/transpermohonan/transpermohonan_bloc.dart';
 import '../../blocs/transpermohonan/transpermohonan_event.dart';
@@ -219,14 +219,14 @@ class _AddEditTranspermohonanDialogState
                                 _activeJenispermohonan?.namaJenispermohonan ??
                                 "",
                           ),
-                          // decoration: InputDecoration(
-                          //   labelText: "Permohonan Aktif",
-                          //   suffixIcon: const Icon(Icons.search),
-                          //   border: const OutlineInputBorder(),
-                          //   errorText: state.validationError?.firstError(
-                          //     "jenishak_id",
-                          //   ),
-                          // ),
+                          decoration: InputDecoration(
+                            labelText: "Permohonan Aktif",
+                            suffixIcon: const Icon(Icons.search),
+                            border: const OutlineInputBorder(),
+                            errorText: state.validationError?.firstError(
+                              "active_jenispermohonan",
+                            ),
+                          ),
                           onTap: () async {
                             final result =
                                 await SearchableSelectionDialog.show<
@@ -775,118 +775,140 @@ class _AddEditTranspermohonanDialogState
   }
 
   Widget _buildStatusSection(TranspermohonanState state) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.settings,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  "Pengaturan Permohonan",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ],
-            ),
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, userState) {
+        if (userState is Authenticated) {
+          final isAdmin = userState.user.isAdmin;
+          return Card(
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.settings,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Pengaturan Permohonan",
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
 
-            const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-            SwitchListTile(
-              value: _active,
-              contentPadding: EdgeInsets.zero,
-              secondary: const Icon(Icons.check_circle_outline),
-              title: const Text("Permohonan Aktif"),
-              subtitle: const Text("Permohonan dapat diproses"),
-              onChanged: (value) {
-                setState(() {
-                  _active = value;
-                });
-              },
-            ),
+                  SwitchListTile(
+                    value: _active,
+                    contentPadding: EdgeInsets.zero,
+                    secondary: const Icon(Icons.check_circle_outline),
+                    title: const Text("Permohonan Aktif"),
+                    subtitle: const Text("Permohonan dapat diproses"),
+                    onChanged: (value) {
+                      if (!isAdmin) {
+                        return;
+                      }
+                      setState(() {
+                        _active = value;
+                      });
+                    },
+                  ),
 
-            const Divider(),
+                  const Divider(),
 
-            SwitchListTile(
-              value: _cekBiaya,
-              contentPadding: EdgeInsets.zero,
-              secondary: const Icon(Icons.payments_outlined),
-              title: const Text("Cek Biaya"),
-              subtitle: const Text("Aktifkan pengecekan biaya"),
-              onChanged: (value) {
-                setState(() {
-                  _cekBiaya = value;
-                });
-              },
-            ),
+                  SwitchListTile(
+                    value: _cekBiaya,
+                    contentPadding: EdgeInsets.zero,
+                    secondary: const Icon(Icons.payments_outlined),
+                    title: const Text("Cek Biaya"),
+                    subtitle: const Text("Aktifkan pengecekan biaya"),
+                    onChanged: (value) {
+                      if (!isAdmin) {
+                        return;
+                      }
+                      setState(() {
+                        _cekBiaya = value;
+                      });
+                    },
+                  ),
 
-            const Divider(),
-            DropdownButtonFormField<String>(
-              initialValue: _periodCekBiaya,
-              decoration: const InputDecoration(
-                labelText: "Periode",
-                border: OutlineInputBorder(),
-              ),
-              items: const [
-                DropdownMenuItem(value: "forever", child: Text("Forever")),
-                DropdownMenuItem(value: "limited", child: Text("Limited")),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  _periodCekBiaya = value!;
-                });
-              },
-            ),
+                  const Divider(),
+                  if (!isAdmin) Text("Periode : $_periodCekBiaya"),
+                  if (isAdmin)
+                    DropdownButtonFormField<String>(
+                      initialValue: _periodCekBiaya,
+                      decoration: const InputDecoration(
+                        labelText: "Periode",
+                        border: OutlineInputBorder(),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: "forever",
+                          child: Text("Forever"),
+                        ),
+                        DropdownMenuItem(
+                          value: "limited",
+                          child: Text("Limited"),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _periodCekBiaya = value!;
+                        });
+                      },
+                    ),
 
-            if (_periodCekBiaya == "limited") ...[
-              const SizedBox(height: 20),
+                  if (_periodCekBiaya == "limited") ...[
+                    const SizedBox(height: 20),
 
-              InkWell(
-                onTap: _pickDateCekBiaya,
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    labelText: "Tanggal Cek Biaya",
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.calendar_month),
-                    errorText: state.validationError?.firstError(
-                      "date_cekbiaya",
+                    InkWell(
+                      onTap: _pickDateCekBiaya,
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: "Tanggal Cek Biaya",
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.calendar_month),
+                          errorText: state.validationError?.firstError(
+                            "date_cekbiaya",
+                          ),
+                        ),
+                        child: Text(
+                          DateFormat("dd MMM yyyy").format(_tanggalCekBiaya),
+                        ),
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 20),
+
+                  TextFormField(
+                    controller: _kodeUnikController,
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: "Kode Unik",
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.qr_code),
+
+                      errorText: state.validationError?.firstError("kode_unik"),
+
+                      // suffixIcon: IconButton(
+                      //   tooltip: "Generate",
+                      //   icon: const Icon(Icons.refresh),
+                      //   onPressed: _generateKodeUnik,
+                      // ),
                     ),
                   ),
-                  child: Text(
-                    DateFormat("dd MMM yyyy").format(_tanggalCekBiaya),
-                  ),
-                ),
-              ),
-            ],
-
-            const SizedBox(height: 20),
-
-            TextFormField(
-              controller: _kodeUnikController,
-              readOnly: true,
-              decoration: InputDecoration(
-                labelText: "Kode Unik",
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.qr_code),
-
-                errorText: state.validationError?.firstError("kode_unik"),
-
-                // suffixIcon: IconButton(
-                //   tooltip: "Generate",
-                //   icon: const Icon(Icons.refresh),
-                //   onPressed: _generateKodeUnik,
-                // ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
+          );
+        }
+        return Container();
+      },
     );
   }
 

@@ -13,8 +13,8 @@ class CardTranspermohonan extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(item.noDaftar, style: Theme.of(context).textTheme.titleMedium),
-            Text(item.tglDaftar, style: Theme.of(context).textTheme.titleSmall),
+            Text(item.noDaftar, style: Theme.of(context).textTheme.bodyMedium),
+            Text(item.tglDaftar, style: Theme.of(context).textTheme.bodyMedium),
           ],
         ),
         subtitle: Column(
@@ -23,8 +23,8 @@ class CardTranspermohonan extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  item.namaPenerima,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  CommonUtils.truncate(item.namaPenerima, 40),
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const Spacer(),
                 Text(

@@ -13,6 +13,7 @@ class DkeluarbiayaByItemRepository {
     int? itemkegiatanId,
     DateTime? startDate,
     DateTime? endDate,
+    String? keyword,
   }) {
     return service.getDkeluarbiayas(
       offset: offset,
@@ -20,6 +21,7 @@ class DkeluarbiayaByItemRepository {
       itemkegiatanId: itemkegiatanId,
       startDate: startDate,
       endDate: endDate,
+      keyword: keyword,
     );
   }
 

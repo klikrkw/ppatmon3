@@ -10,15 +10,29 @@ import 'package:newklikrkw/enums/date_filter_range.dart';
 import 'package:newklikrkw/models/itemkegiatan.dart';
 import 'package:newklikrkw/widgets/searchable_selection_dialog.dart';
 
-class DkeluarbiayaByItemFilter extends StatelessWidget {
+class DkeluarbiayaByItemFilter extends StatefulWidget {
   final List<Itemkegiatan> itemkegiatans;
 
   const DkeluarbiayaByItemFilter({super.key, required this.itemkegiatans});
 
   @override
+  State<DkeluarbiayaByItemFilter> createState() =>
+      _DkeluarbiayaByItemFilterState();
+}
+
+class _DkeluarbiayaByItemFilterState extends State<DkeluarbiayaByItemFilter> {
+  final TextEditingController _searchController = TextEditingController();
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<DkeluarbiayaByItemBloc, DkeluarbiayaByItemState>(
       builder: (context, state) {
+        _searchController.text = state.keyword;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -132,50 +146,107 @@ class DkeluarbiayaByItemFilter extends StatelessWidget {
             // ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: TextFormField(
-                readOnly: true,
-                controller: TextEditingController(
-                  text: state.selectedItemkegiatanId == null
-                      ? ''
-                      : itemkegiatans
-                            .firstWhere(
-                              (item) => item.id == state.selectedItemkegiatanId,
-                            )
-                            .namaItemkegiatan,
-                ),
-                decoration: InputDecoration(
-                  labelText: "Item Kegiatan",
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.category),
-                  suffixIcon: const Icon(Icons.search),
-                ),
-                onTap: () async {
-                  final result = await Navigator.push<Itemkegiatan>(
-                    context,
-                    MaterialPageRoute(
-                      fullscreenDialog: true,
-                      builder: (_) => SearchableSelectionDialog<Itemkegiatan>(
-                        title: "Pilih Item Kegiatan",
-                        searchHint: "Cari item kegiatan...",
-                        items: itemkegiatans,
-                        selectedItem: state.selectedItemkegiatanId == null
-                            ? null
-                            : itemkegiatans.firstWhere(
-                                (item) =>
-                                    item.id == state.selectedItemkegiatanId,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          readOnly: true,
+                          controller: TextEditingController(
+                            text: state.selectedItemkegiatanId == null
+                                ? ''
+                                : widget.itemkegiatans
+                                      .firstWhere(
+                                        (item) =>
+                                            item.id ==
+                                            state.selectedItemkegiatanId,
+                                      )
+                                      .namaItemkegiatan,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: "Item Kegiatan",
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.category),
+                            suffixIcon: Icon(Icons.search),
+                          ),
+                          onTap: () async {
+                            final result = await Navigator.push<Itemkegiatan>(
+                              context,
+                              MaterialPageRoute(
+                                fullscreenDialog: true,
+                                builder: (_) =>
+                                    SearchableSelectionDialog<Itemkegiatan>(
+                                      title: "Pilih Item Kegiatan",
+                                      searchHint: "Cari item kegiatan...",
+                                      items: widget.itemkegiatans,
+                                      selectedItem:
+                                          state.selectedItemkegiatanId == null
+                                          ? null
+                                          : widget.itemkegiatans.firstWhere(
+                                              (item) =>
+                                                  item.id ==
+                                                  state.selectedItemkegiatanId,
+                                            ),
+                                      itemLabelBuilder: (item) =>
+                                          item.namaItemkegiatan,
+                                    ),
                               ),
-                        itemLabelBuilder: (item) => item.namaItemkegiatan,
-                      ),
-                    ),
-                  );
+                            );
 
-                  if (!context.mounted) return;
-                  if (result != null) {
-                    context.read<DkeluarbiayaByItemBloc>().add(
-                      ChangeItemkegiatanFilter(result.id),
-                    );
-                  }
-                },
+                            if (!context.mounted) return;
+
+                            if (result != null) {
+                              context.read<DkeluarbiayaByItemBloc>().add(
+                                ChangeItemkegiatanFilter(result.id),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () {
+                          context.read<DkeluarbiayaByItemBloc>().add(
+                            const ResetFilterDkeluarbiayasByItem(),
+                          );
+                        },
+                        icon: const Icon(Icons.refresh),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: "Cari berdasarkan keterangan...",
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: state.keyword.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  _searchController.clear();
+
+                                  context.read<DkeluarbiayaByItemBloc>().add(
+                                    const SearchKeteranganChanged(""),
+                                  );
+                                },
+                              )
+                            : null,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        context.read<DkeluarbiayaByItemBloc>().add(
+                          SearchKeteranganChanged(value),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
             if (state.selectedRange == DateFilterRange.custom)
@@ -198,18 +269,18 @@ class DkeluarbiayaByItemFilter extends StatelessWidget {
             //       style: Theme.of(context).textTheme.bodyMedium,
             //     ),
             //   ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: () {
-                  context.read<DkeluarbiayaByItemBloc>().add(
-                    const ResetFilterDkeluarbiayasByItem(),
-                  );
-                },
-                icon: const Icon(Icons.refresh),
-                label: const Text("Reset Filter"),
-              ),
-            ),
+            // Align(
+            //   alignment: Alignment.centerRight,
+            //   child: TextButton.icon(
+            //     onPressed: () {
+            //       context.read<DkeluarbiayaByItemBloc>().add(
+            //         const ResetFilterDkeluarbiayasByItem(),
+            //       );
+            //     },
+            //     icon: const Icon(Icons.refresh),
+            //     label: const Text("Reset Filter"),
+            //   ),
+            // ),
           ],
         );
       },

@@ -91,6 +91,9 @@ class TranspermohonanBloc
         items: [],
         hasReachedMax: false,
         item: null,
+        query: event.query,
+        active: event.active,
+        userId: event.userId,
       ),
     );
 
@@ -98,8 +101,9 @@ class TranspermohonanBloc
       final data = await repository.getData(
         offset: 0,
         limit: pageSize,
-        userId: state.userId,
-        active: state.active,
+        userId: event.userId,
+        active: event.active,
+        query: event.query!,
       );
 
       emit(
@@ -171,7 +175,13 @@ class TranspermohonanBloc
     RefreshTranspermohonan event,
     Emitter<TranspermohonanState> emit,
   ) async {
-    add(LoadTranspermohonan());
+    add(
+      LoadTranspermohonan(
+        query: state.query,
+        active: state.active,
+        userId: state.userId,
+      ),
+    );
   }
 
   Future<void> _onFilterChanged(
@@ -271,13 +281,9 @@ class TranspermohonanBloc
     Emitter<TranspermohonanState> emit,
   ) async {
     emit(state.copyWith(loading: true, transpermohonan: null));
-
     final data = await repository.getData(
       offset: 0,
       limit: pageSize,
-      query: state.query,
-      active: state.active,
-      userId: state.userId,
       transpermohonanId: event.transpermohonanId,
       isTranspermohonanId: event.isTranspermohonanId!,
     );

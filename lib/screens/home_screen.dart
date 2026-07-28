@@ -256,9 +256,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (result == null || result.isEmpty) {
       return;
     }
-
     context.read<TranspermohonanBloc>().add(
-      FilterQrCode(transpermohonanId: result),
+      FilterQrCode(transpermohonanId: result, isTranspermohonanId: true),
     );
 
     Navigator.push(

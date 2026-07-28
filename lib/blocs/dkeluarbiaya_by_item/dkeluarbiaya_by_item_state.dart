@@ -31,7 +31,7 @@ class DkeluarbiayaByItemState extends Equatable {
   final int? selectedItemkegiatanId;
 
   final List<Itemkegiatan> itemkegiatans;
-
+  final String keyword;
   const DkeluarbiayaByItemState({
     this.items = const [],
 
@@ -53,6 +53,8 @@ class DkeluarbiayaByItemState extends Equatable {
 
     this.selectedItemkegiatanId,
     this.itemkegiatans = const [],
+
+    this.keyword = '',
   });
 
   factory DkeluarbiayaByItemState.initial() {
@@ -81,6 +83,8 @@ class DkeluarbiayaByItemState extends Equatable {
     int? selectedItemkegiatanId,
     bool clearSelectedItem = false,
     List<Itemkegiatan>? itemkegiatans,
+
+    String? keyword,
   }) {
     return DkeluarbiayaByItemState(
       items: items ?? this.items,
@@ -107,6 +111,8 @@ class DkeluarbiayaByItemState extends Equatable {
 
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
+
+      keyword: keyword ?? this.keyword,
     );
   }
 
@@ -145,5 +151,7 @@ class DkeluarbiayaByItemState extends Equatable {
 
     startDate,
     endDate,
+
+    keyword,
   ];
 }

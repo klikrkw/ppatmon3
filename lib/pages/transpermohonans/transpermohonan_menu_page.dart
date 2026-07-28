@@ -21,9 +21,9 @@ class TranspermohonanMenuPage extends StatelessWidget {
       listenWhen: (previous, current) =>
           previous.transpermohonan != current.transpermohonan,
       listener: (context, state) {
-        if (state.transpermohonan == null) {
-          Navigator.of(context).pop();
-        }
+        // if (state.transpermohonan == null) {
+        //   Navigator.of(context).pop();
+        // }
         if (state.error != null) {
           ScaffoldMessenger.of(
             context,
@@ -37,6 +37,10 @@ class TranspermohonanMenuPage extends StatelessWidget {
             if (state.loading) {
               return const Center(child: CircularProgressIndicator());
             }
+            if (state.transpermohonan == null) {
+              return const Center(child: Text("Tidak ada data"));
+            }
+
             return SingleChildScrollView(
               child: Column(
                 children: [

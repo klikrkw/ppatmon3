@@ -62,7 +62,6 @@ class TranspermohonanService {
         ),
       );
       final List<dynamic> data = response.data['data'];
-
       return data.map((e) => Transpermohonan.fromJson(e)).toList();
     } on DioException catch (e) {
       throw Exception(e);
