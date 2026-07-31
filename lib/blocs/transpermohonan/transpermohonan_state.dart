@@ -87,7 +87,7 @@ class TranspermohonanState extends Equatable {
     String? errorMessage,
     String? query,
     bool? active,
-    int? userId,
+    Object? userId = _unset,
     String? transpermohonanId,
     Object? item = _unset,
     Object? transpermohonan = _unset,
@@ -110,7 +110,7 @@ class TranspermohonanState extends Equatable {
       errorMessage: errorMessage,
       query: query ?? this.query,
       active: active ?? this.active,
-      userId: userId ?? this.userId,
+      userId: userId == _unset ? this.userId : userId as int?,
       transpermohonanId: transpermohonanId ?? this.transpermohonanId,
       item: item == _unset ? this.item : item as Transpermohonan?,
       transpermohonan: transpermohonan == _unset

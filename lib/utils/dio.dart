@@ -17,7 +17,7 @@ final Dio dio = Dio(
     baseUrl: Platform.isAndroid
         ? 'https://newklikrkw.masbahtr.com/api/v1'
         : 'https://newklikrkw.masbahtr.com/api/v1',
-    connectTimeout: const Duration(seconds: 5),
+    // connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 3),
   ),
 );

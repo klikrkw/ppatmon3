@@ -44,7 +44,11 @@ class NeracaBloc extends Bloc<NeracaEvent, NeracaState> {
     Emitter<NeracaState> emit,
   ) async {
     emit(
-      state.copyWith(loading: true, clearError: true, transpermohonanId: null),
+      state.copyWith(
+        loading: true,
+        clearError: true,
+        transpermohonanId: event.transpermohonanId,
+      ),
     );
 
     try {
@@ -92,7 +96,7 @@ class NeracaBloc extends Bloc<NeracaEvent, NeracaState> {
     emit(state.copyWith(refreshing: true, clearError: true));
 
     try {
-      final result = await _fetchDataNeracaPermohonan(null);
+      final result = await _fetchDataNeracaPermohonan(state.transpermohonanId);
 
       emit(
         state.copyWith(

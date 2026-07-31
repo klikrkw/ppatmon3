@@ -22,13 +22,15 @@ class TranspermohonanMenuPage extends StatelessWidget {
           previous.transpermohonan != current.transpermohonan ||
           previous.saveSuccess != current.saveSuccess,
       listener: (context, state) {
-        // if (state.transpermohonan == null) {
-        //   Navigator.of(context).pop();
-        // }
         if (state.error != null) {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.error!)));
+        }
+        if (state.saveSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Perubahan berhasil disimpan')),
+          );
         }
       },
       child: Scaffold(
