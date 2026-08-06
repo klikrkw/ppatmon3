@@ -51,6 +51,8 @@ class PostingjurnalState extends Equatable {
   final DateTime startDate;
   final DateTime endDate;
   final bool loadingAkuns;
+  final String keyword;
+
   const PostingjurnalState({
     this.items = const [],
 
@@ -77,6 +79,7 @@ class PostingjurnalState extends Equatable {
     this.saving = false,
     this.akuns = const [],
     this.saveSuccess = false,
+    this.keyword = '',
   });
 
   factory PostingjurnalState.initial() {
@@ -133,6 +136,7 @@ class PostingjurnalState extends Equatable {
     bool clearDeleteErrorMessage = false,
     bool clearValidationError = false,
     bool? loadingAkuns,
+    String? keyword,
   }) {
     return PostingjurnalState(
       items: items ?? this.items,
@@ -164,6 +168,7 @@ class PostingjurnalState extends Equatable {
       akuns: akuns ?? this.akuns,
       saveSuccess: saveSuccess ?? this.saveSuccess,
       loadingAkuns: loadingAkuns ?? this.loadingAkuns,
+      keyword: keyword ?? this.keyword,
     );
   }
 
@@ -210,5 +215,7 @@ class PostingjurnalState extends Equatable {
     saving,
     akuns,
     saveSuccess,
+    loadingAkuns,
+    keyword,
   ];
 }

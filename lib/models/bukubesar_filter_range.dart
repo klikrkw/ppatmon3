@@ -1,10 +1,19 @@
-enum BukubesarFilterRange { today, thisWeek, thisMonth, thisYear, custom }
+enum BukubesarFilterRange {
+  today,
+  lastSevenDays,
+  thisWeek,
+  thisMonth,
+  thisYear,
+  custom,
+}
 
 extension BukubesarFilterRangeExtension on BukubesarFilterRange {
   String get label {
     switch (this) {
       case BukubesarFilterRange.today:
         return "Hari Ini";
+      case BukubesarFilterRange.lastSevenDays:
+        return "7 Hari Terakhir";
 
       case BukubesarFilterRange.thisWeek:
         return "Minggu Ini";

@@ -18,7 +18,7 @@ class AuthRepository {
       await _storage.write(key: _tokenKey, value: user.token);
     } else {
       await _storage.delete(key: _tokenKey);
-      throw Exception(data['message'] ?? 'Gagal terhubung ke server');
+      throw Exception(data['message'] ?? 'App Gagal terhubung ke server');
     }
     return user;
   }

@@ -56,6 +56,7 @@ class _PostingjurnalView extends StatefulWidget {
 
 class _PostingjurnalViewState extends State<_PostingjurnalView> {
   final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();

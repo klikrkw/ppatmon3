@@ -183,6 +183,12 @@ class BukubesarBloc extends Bloc<BukubesarEvent, BukubesarState> {
         end = DateTime(now.year, now.month, now.day, 23, 59, 59);
         break;
 
+      case BukubesarFilterRange.lastSevenDays:
+        // start = now.subtract(Duration(days: now.weekday - 1));
+        start = now.subtract(Duration(days: 7));
+
+        end = now;
+        break;
       case BukubesarFilterRange.thisWeek:
         start = now.subtract(Duration(days: now.weekday - 1));
 

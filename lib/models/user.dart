@@ -6,6 +6,7 @@ class User {
   final String name;
   final bool? isAdmin;
   final List<Role>? roles;
+  final List<String>? permissions;
 
   User({
     this.email,
@@ -13,6 +14,7 @@ class User {
     this.roles,
     required this.id,
     this.isAdmin,
+    this.permissions,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -23,7 +25,10 @@ class User {
       isAdmin: json['is_admin'],
       roles: json['roles'] != null
           ? (json['roles'] as List).map((e) => Role.fromJson(e)).toList()
-          : null,
+          : [],
+      permissions: json['permissions'] != null
+          ? (json['permissions'] as List).map((e) => e.toString()).toList()
+          : [],
     );
   }
 
@@ -32,5 +37,7 @@ class User {
     'email': email,
     'name': name,
     'is_admin': isAdmin,
+    // 'roles': roles?.map((e) => e).toList(),
+    // 'permissions': permissions,
   };
 }

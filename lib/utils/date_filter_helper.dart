@@ -3,6 +3,10 @@ class DateFilterHelper {
     return date.subtract(Duration(days: date.weekday - 1));
   }
 
+  static DateTime lastsevenDays(DateTime date) {
+    return date.subtract(Duration(days: 7));
+  }
+
   static DateTime lastDayOfWeek(DateTime date) {
     return firstDayOfWeek(date).add(const Duration(days: 6));
   }

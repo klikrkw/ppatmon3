@@ -138,3 +138,12 @@ class ResetDeleteState extends PostingjurnalEvent {
 class ResetPostingjurnalState extends PostingjurnalEvent {
   const ResetPostingjurnalState();
 }
+
+class SearchUraianChanged extends PostingjurnalEvent {
+  final String keyword;
+
+  const SearchUraianChanged(this.keyword);
+
+  @override
+  List<Object?> get props => [keyword];
+}

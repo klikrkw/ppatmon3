@@ -1,10 +1,20 @@
-enum PostingjurnalFilterRange { today, thisWeek, thisMonth, thisYear, custom }
+enum PostingjurnalFilterRange {
+  today,
+  lastSevenDays,
+  thisWeek,
+  thisMonth,
+  thisYear,
+  custom,
+}
 
 extension PostingjurnalFilterRangeExtension on PostingjurnalFilterRange {
   String get label {
     switch (this) {
       case PostingjurnalFilterRange.today:
         return "Hari Ini";
+
+      case PostingjurnalFilterRange.lastSevenDays:
+        return "7 Hari Terakhir";
 
       case PostingjurnalFilterRange.thisWeek:
         return "Minggu Ini";

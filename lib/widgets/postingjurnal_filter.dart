@@ -8,9 +8,15 @@ import 'package:newklikrkw/blocs/postingjurnal/postingjurnal_state.dart';
 
 import 'package:newklikrkw/enums/postingjurnal_filter_range.dart';
 
-class PostingjurnalFilter extends StatelessWidget {
+class PostingjurnalFilter extends StatefulWidget {
   const PostingjurnalFilter({super.key});
 
+  @override
+  State<PostingjurnalFilter> createState() => _PostingjurnalFilterState();
+}
+
+class _PostingjurnalFilterState extends State<PostingjurnalFilter> {
+  final _searchController = TextEditingController();
   Future<void> _selectPeriod(BuildContext context) async {
     final bloc = context.read<PostingjurnalBloc>();
 
@@ -46,9 +52,17 @@ class PostingjurnalFilter extends StatelessWidget {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<PostingjurnalBloc, PostingjurnalState>(
       builder: (context, state) {
+        _searchController.text = state.keyword;
+
         return Column(
           children: [
             const SizedBox(height: 8),
@@ -111,6 +125,51 @@ class PostingjurnalFilter extends StatelessWidget {
                   ],
                 ),
               ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: "Cari uraian ...",
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: state.keyword.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  _searchController.clear();
+
+                                  context.read<PostingjurnalBloc>().add(
+                                    const SearchUraianChanged(""),
+                                  );
+                                },
+                              )
+                            : null,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        context.read<PostingjurnalBloc>().add(
+                          SearchUraianChanged(value),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () {
+                      context.read<PostingjurnalBloc>().add(
+                        const ResetPostingjurnalFilter(),
+                      );
+                    },
+                    icon: const Icon(Icons.refresh),
+                  ),
+                ],
+              ),
+            ),
           ],
         );
       },

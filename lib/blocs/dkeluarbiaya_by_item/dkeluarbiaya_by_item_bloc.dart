@@ -68,6 +68,8 @@ class DkeluarbiayaByItemBloc
 
         return (today, today);
 
+      case DateFilterRange.lastSevenDays:
+        return (DateFilterHelper.lastsevenDays(now), now);
       case DateFilterRange.thisWeek:
         return (
           DateFilterHelper.firstDayOfWeek(now),

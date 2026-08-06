@@ -1,6 +1,7 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:newklikrkw/blocs/bayarbiayaperm/bayarbiayaperm_bloc.dart';
 import 'package:newklikrkw/models/postingjurnal.dart';
 import 'package:newklikrkw/models/validation_exception.dart';
 
@@ -53,6 +54,10 @@ class PostingjurnalBloc extends Bloc<PostingjurnalEvent, PostingjurnalState> {
 
     on<ResetDeleteState>(_onResetDeleteState);
     on<ResetPostingjurnalState>(_onResetPostingjurnalState);
+    on<SearchUraianChanged>(
+      _onSearchChanged,
+      transformer: debounceRestartable(const Duration(milliseconds: 500)),
+    );
   }
 
   ///==========================================================
@@ -76,6 +81,9 @@ class PostingjurnalBloc extends Bloc<PostingjurnalEvent, PostingjurnalState> {
           DateTime(now.year, now.month, now.day),
           DateTime(now.year, now.month, now.day, 23, 59, 59),
         );
+
+      case PostingjurnalFilterRange.lastSevenDays:
+        return (DateTime(now.year, now.month, now.day - 7), now);
 
       case PostingjurnalFilterRange.thisWeek:
         final start = now.subtract(Duration(days: now.weekday - 1));
@@ -118,6 +126,7 @@ class PostingjurnalBloc extends Bloc<PostingjurnalEvent, PostingjurnalState> {
       limit: state.limit,
       startDate: startDate ?? state.startDate,
       endDate: endDate ?? state.endDate,
+      keyword: state.keyword.isEmpty ? null : state.keyword,
     );
   }
 
@@ -129,6 +138,9 @@ class PostingjurnalBloc extends Bloc<PostingjurnalEvent, PostingjurnalState> {
         items: const [],
         offset: 0,
         hasMore: true,
+        errorMessage: null,
+        refreshing: false,
+        loadingMore: false,
       ),
     );
 
@@ -262,6 +274,7 @@ class PostingjurnalBloc extends Bloc<PostingjurnalEvent, PostingjurnalState> {
         offset: 0,
         hasMore: true,
         clearError: true,
+        keyword: '',
       ),
     );
 
@@ -443,5 +456,14 @@ class PostingjurnalBloc extends Bloc<PostingjurnalEvent, PostingjurnalState> {
 
   List<Postingjurnal> _removeItem(List<Postingjurnal> items, String id) {
     return items.where((e) => e.id != id).toList();
+  }
+
+  Future<void> _onSearchChanged(
+    SearchUraianChanged event,
+    Emitter<PostingjurnalState> emit,
+  ) async {
+    emit(state.copyWith(keyword: event.keyword));
+
+    await _reload(emit);
   }
 }

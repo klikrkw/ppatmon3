@@ -9,6 +9,7 @@ class PostingjurnalService {
     int limit = 20,
     DateTime? startDate,
     DateTime? endDate,
+    String? keyword,
   }) async {
     try {
       String? token = await getToken();
@@ -22,6 +23,7 @@ class PostingjurnalService {
           if (startDate != null) "start_date": startDate.toIso8601String(),
 
           if (endDate != null) "end_date": endDate.toIso8601String(),
+          "keyword": ?keyword,
         },
         options: Options(
           responseType: ResponseType.json,

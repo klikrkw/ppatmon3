@@ -21,12 +21,14 @@ class PostingjurnalRepository {
     int limit = 20,
     DateTime? startDate,
     DateTime? endDate,
+    String? keyword,
   }) {
     return service.getPostingjurnals(
       offset: offset,
       limit: limit,
       startDate: startDate,
       endDate: endDate,
+      keyword: keyword,
     );
   }
   //==================================================
