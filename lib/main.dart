@@ -6,6 +6,7 @@ import 'package:newklikrkw/blocs/bayarbiayaperm/bayarbiayaperm_bloc.dart';
 import 'package:newklikrkw/blocs/berkas_lokasi/berkas_lokasi_bloc.dart';
 import 'package:newklikrkw/blocs/biayaperm/biayaperm_bloc.dart';
 import 'package:newklikrkw/blocs/bukubesar/bukubesar_bloc.dart';
+import 'package:newklikrkw/blocs/catatanperm/catatanperm_bloc.dart';
 import 'package:newklikrkw/blocs/home/home_bloc.dart';
 // import 'package:newklikrkw/blocs/item/item_bloc.dart';
 // import 'package:newklikrkw/blocs/item/item_event.dart';
@@ -19,13 +20,16 @@ import 'package:newklikrkw/blocs/theme/theme_bloc.dart';
 import 'package:newklikrkw/blocs/theme/theme_state.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_bloc.dart';
 import 'package:newklikrkw/core/theme/app_theme.dart';
-// import 'package:newklikrkw/models/product_model.dart';
 import 'package:newklikrkw/pages/login_page.dart';
+// import 'package:newklikrkw/core/theme/app_theme.dart';
+// import 'package:newklikrkw/models/product_model.dart';
+// import 'package:newklikrkw/pages/login_page.dart';
 import 'package:newklikrkw/repositories/auth_repository.dart';
 import 'package:newklikrkw/repositories/bayarbiayaperm_repository.dart';
 import 'package:newklikrkw/repositories/berkas_lokasi_repository.dart';
 import 'package:newklikrkw/repositories/biayaperm_repository.dart';
 import 'package:newklikrkw/repositories/bukubesar_repository.dart';
+import 'package:newklikrkw/repositories/catatanperm_repository.dart';
 // import 'package:newklikrkw/repositories/database_repository.dart';
 import 'package:newklikrkw/repositories/desa_repository.dart';
 import 'package:newklikrkw/repositories/home_repository.dart';
@@ -45,6 +49,7 @@ import 'package:newklikrkw/services/bayarbiayaperm.dart';
 import 'package:newklikrkw/services/berkas_lokasi_service.dart';
 import 'package:newklikrkw/services/biayaperm_service.dart';
 import 'package:newklikrkw/services/bukubesar_service.dart';
+import 'package:newklikrkw/services/catatanperm_service.dart';
 import 'package:newklikrkw/services/desa_service.dart';
 import 'package:newklikrkw/services/home_service.dart';
 import 'package:newklikrkw/services/jenishak_service.dart';
@@ -57,6 +62,7 @@ import 'package:newklikrkw/services/postingjurnal_service.dart';
 import 'package:newklikrkw/services/prosespermohonan_service.dart';
 import 'package:newklikrkw/services/trans_permohonan_service.dart';
 import 'package:newklikrkw/services/user_service.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -221,24 +227,44 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
         ),
+        BlocProvider(
+          create: (_) => CatatanpermBloc(
+            repository: CatatanpermRepository(service: CatatanpermService()),
+          ),
+        ),
         BlocProvider(create: (_) => HomeBloc(HomeRepository(HomeService()))),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, state) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
+
             title: 'Monitoring App',
+
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: state.themeMode,
+
+            locale: const Locale('id', ''),
+
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+
+            supportedLocales: const [Locale('id', ''), Locale('en', '')],
+
             routes: routes,
+
             home: BlocBuilder<AuthBloc, AuthState>(
               builder: (context, state) {
                 if (state is Authenticated) {
                   return const HomeScreen();
                 }
+
                 if (state is Unauthenticated || state is AuthFailure) {
-                  return LoginPage();
+                  return const LoginPage();
                 }
 
                 return const Scaffold(
@@ -246,10 +272,6 @@ class _MyAppState extends State<MyApp> {
                 );
               },
             ),
-            supportedLocales: [
-              const Locale('id', ''), // Indonesia
-              const Locale('en', ''), // Inggris
-            ],
           );
         },
       ),

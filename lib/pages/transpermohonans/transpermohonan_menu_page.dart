@@ -4,6 +4,7 @@ import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_bloc.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_event.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_state.dart';
 import 'package:newklikrkw/pages/biayaperms/biayaperm_page.dart';
+import 'package:newklikrkw/pages/catatanperms/catatanperm_list_page.dart';
 import 'package:newklikrkw/pages/dkeluarbiayapermusers/dkeluarbiayapermuser_tp_list_page.dart';
 import 'package:newklikrkw/pages/lapkeuangans/neraca_permohonan_page.dart';
 import 'package:newklikrkw/pages/lokasi_berkas_page.dart';
@@ -162,6 +163,21 @@ List<HomeFeature> _buildFeatures(
           //   FilterQrCode(transpermohonanId: state.transpermohonan!.id),
           // );
         }
+      },
+    ),
+    HomeFeature(
+      title: "Catatan",
+      icon: Icons.note_add_outlined,
+      color: Colors.green.shade700,
+      onTap: () async {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CatatanpermListPage(
+              transpermohonanId: state.transpermohonan!.id,
+            ),
+          ),
+        );
       },
     ),
   ];
