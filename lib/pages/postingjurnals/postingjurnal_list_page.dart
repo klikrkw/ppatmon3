@@ -5,6 +5,7 @@ import 'package:newklikrkw/blocs/auth/auth.dart';
 import 'package:newklikrkw/blocs/postingjurnal/postingjurnal_bloc.dart';
 import 'package:newklikrkw/blocs/postingjurnal/postingjurnal_event.dart';
 import 'package:newklikrkw/blocs/postingjurnal/postingjurnal_state.dart';
+import 'package:newklikrkw/enums/user_permission.dart';
 
 import 'package:newklikrkw/models/postingjurnal.dart';
 
@@ -146,7 +147,8 @@ class _PostingjurnalViewState extends State<_PostingjurnalView> {
     return Scaffold(
       appBar: AppBar(title: const Text("Posting Jurnal"), centerTitle: true),
 
-      floatingActionButton: user?.isAdmin == true
+      floatingActionButton:
+          user!.hasPermissions(UserPermission.aksesPostingJurnal.value)
           ? FloatingActionButton.extended(
               heroTag: "postingjurnal_add",
               onPressed: () {
@@ -301,18 +303,18 @@ class _PostingjurnalViewState extends State<_PostingjurnalView> {
                               return PostingjurnalCard(
                                 index: index,
                                 item: item,
-                                onTap: () {
+                                onImageTap: () {
                                   if (item.hasImage) {
                                     _showImage(item);
                                   }
                                 },
                                 onEdit: () {
-                                  if (user!.isAdmin == true) {
+                                  if (user.isAdmin == true) {
                                     _showAddEditPostingjurnalDialog(data: item);
                                   }
                                 },
                                 onDelete: () {
-                                  if (user!.isAdmin == true) {
+                                  if (user.isAdmin == true) {
                                     _deleteItem(item);
                                   }
                                 },

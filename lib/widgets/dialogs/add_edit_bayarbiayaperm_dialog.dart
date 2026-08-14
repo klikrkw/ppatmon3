@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:newklikrkw/blocs/bayarbiayaperm/bayarbiayaperm_bloc.dart';
 import 'package:newklikrkw/blocs/bayarbiayaperm/bayarbiayaperm_event.dart';
@@ -13,6 +12,8 @@ import 'package:newklikrkw/models/biayaperm.dart';
 import 'package:newklikrkw/models/metodebayar.dart';
 import 'package:newklikrkw/models/rekening.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:newklikrkw/utils/dio.dart';
+import 'package:newklikrkw/widgets/image_upload_widget.dart';
 
 final currency = NumberFormat.currency(
   locale: 'id_ID',
@@ -65,9 +66,12 @@ class _AddEditBayarbiayapermDialogState
 
   Rekening? _selectedRekening;
 
-  XFile? _imageFile;
+  // XFile? _imageFile;
 
   String? _imageUrl;
+  File? _imageFile;
+
+  String? _oldImage;
 
   bool get isEdit => widget.isEdit;
 
@@ -98,6 +102,7 @@ class _AddEditBayarbiayapermDialogState
       _saldoAkhirController.text = item.saldoAkhir.toStringAsFixed(0);
       _catatanController.text = item.catatanBayarbiayaperm;
       _imageUrl = item.imageBayarbiayaperm;
+      _oldImage = "$myBaseUrl${item.imageBayarbiayaperm}";
     } else {
       _saldoAwalController.text = NumberFormat.decimalPattern(
         "id",
@@ -120,6 +125,8 @@ class _AddEditBayarbiayapermDialogState
 
     super.dispose();
   }
+
+  BayarbiayapermBloc get bloc => context.read<BayarbiayapermBloc>();
 
   void _calculateKurangBayar() {
     final biaya = _toDouble(_saldoAwalController);
@@ -334,79 +341,105 @@ class _AddEditBayarbiayapermDialogState
 
                         const SizedBox(height: 12),
 
-                        Center(
-                          child: GestureDetector(
-                            onTap: _pickImage,
-                            child: Container(
-                              width: 180,
-                              height: 180,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: _imageFile != null
-                                  ? Image.file(
-                                      File(_imageFile!.path),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : (_imageUrl != null && _imageUrl!.isNotEmpty)
-                                  ? Image.network(
-                                      _imageUrl!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, _, _) =>
-                                          const Icon(Icons.image, size: 60),
-                                    )
-                                  : const Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.add_a_photo, size: 50),
-                                        SizedBox(height: 8),
-                                        Text("Pilih Gambar"),
-                                      ],
-                                    ),
-                            ),
-                          ),
-                        ),
+                        // Center(
+                        //   child: GestureDetector(
+                        //     onTap: _pickImage,
+                        //     child: Container(
+                        //       width: 180,
+                        //       height: 180,
+                        //       decoration: BoxDecoration(
+                        //         border: Border.all(color: Colors.grey.shade400),
+                        //         borderRadius: BorderRadius.circular(12),
+                        //       ),
+                        //       clipBehavior: Clip.antiAlias,
+                        //       child: _imageFile != null
+                        //           ? Image.file(
+                        //               File(_imageFile!.path),
+                        //               fit: BoxFit.cover,
+                        //             )
+                        //           : (_imageUrl != null && _imageUrl!.isNotEmpty)
+                        //           ? Image.network(
+                        //               _imageUrl!,
+                        //               fit: BoxFit.cover,
+                        //               errorBuilder: (_, _, _) =>
+                        //                   const Icon(Icons.image, size: 60),
+                        //             )
+                        //           : const Column(
+                        //               mainAxisAlignment:
+                        //                   MainAxisAlignment.center,
+                        //               children: [
+                        //                 Icon(Icons.add_a_photo, size: 50),
+                        //                 SizedBox(height: 8),
+                        //                 Text("Pilih Gambar"),
+                        //               ],
+                        //             ),
+                        //     ),
+                        //   ),
+                        // ),
 
-                        if (_validation(state, "image_bayarbiayaperm") != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(
-                              _validation(state, "image_bayarbiayaperm")!,
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          ),
+                        // if (_validation(state, "image_bayarbiayaperm") != null)
+                        //   Padding(
+                        //     padding: const EdgeInsets.only(top: 8),
+                        //     child: Text(
+                        //       _validation(state, "image_bayarbiayaperm")!,
+                        //       style: const TextStyle(color: Colors.red),
+                        //     ),
+                        //   ),
 
-                        const SizedBox(height: 12),
+                        // const SizedBox(height: 12),
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // OutlinedButton.icon(
-                            //   onPressed: _pickImage,
-                            //   icon: const Icon(Icons.photo_library),
-                            //   label: const Text("Pilih"),
-                            // ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.center,
+                        //   children: [
+                        //     // OutlinedButton.icon(
+                        //     //   onPressed: _pickImage,
+                        //     //   icon: const Icon(Icons.photo_library),
+                        //     //   label: const Text("Pilih"),
+                        //     // ),
 
-                            // const SizedBox(width: 12),
-                            if (_imageFile != null ||
-                                (_imageUrl != null && _imageUrl!.isNotEmpty))
-                              OutlinedButton.icon(
-                                onPressed: () {
-                                  setState(() {
-                                    _imageFile = null;
-                                    _imageUrl = null;
-                                  });
-                                },
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                label: const Text("Hapus"),
-                              ),
-                          ],
+                        //     // const SizedBox(width: 12),
+                        //     if (_imageFile != null ||
+                        //         (_imageUrl != null && _imageUrl!.isNotEmpty))
+                        //       OutlinedButton.icon(
+                        //         onPressed: () {
+                        //           setState(() {
+                        //             _imageFile = null;
+                        //             _imageUrl = null;
+                        //           });
+                        //         },
+                        //         icon: const Icon(
+                        //           Icons.delete,
+                        //           color: Colors.red,
+                        //         ),
+                        //         label: const Text("Hapus"),
+                        //       ),
+                        //   ],
+                        // ),
+                        ImageUploadWidget(
+                          imageFile: _imageFile,
+
+                          imageUrl: _oldImage,
+
+                          folderName: 'biayaperm',
+
+                          maxSizeInMB: 1,
+
+                          onChanged: (file) {
+                            setState(() {
+                              _imageFile = file;
+                            });
+
+                            bloc.add(ResetValidationError());
+                          },
+
+                          onRemove: () {
+                            setState(() {
+                              _imageFile = null;
+                              _oldImage = null;
+                            });
+
+                            bloc.add(ResetValidationError());
+                          },
                         ),
 
                         const SizedBox(height: 32),
@@ -478,47 +511,47 @@ class _AddEditBayarbiayapermDialogState
   //   });
   // }
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
+  // Future<void> _pickImage() async {
+  //   final picker = ImagePicker();
 
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      builder: (context) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text("Kamera"),
-                onTap: () {
-                  Navigator.pop(context, ImageSource.camera);
-                },
-              ),
+  //   final source = await showModalBottomSheet<ImageSource>(
+  //     context: context,
+  //     builder: (context) {
+  //       return SafeArea(
+  //         child: Wrap(
+  //           children: [
+  //             ListTile(
+  //               leading: const Icon(Icons.camera_alt),
+  //               title: const Text("Kamera"),
+  //               onTap: () {
+  //                 Navigator.pop(context, ImageSource.camera);
+  //               },
+  //             ),
 
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text("Galeri"),
-                onTap: () {
-                  Navigator.pop(context, ImageSource.gallery);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  //             ListTile(
+  //               leading: const Icon(Icons.photo_library),
+  //               title: const Text("Galeri"),
+  //               onTap: () {
+  //                 Navigator.pop(context, ImageSource.gallery);
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
 
-    if (source == null) return;
+  //   if (source == null) return;
 
-    final file = await picker.pickImage(source: source, imageQuality: 80);
+  //   final file = await picker.pickImage(source: source, imageQuality: 80);
 
-    if (file == null) return;
+  //   if (file == null) return;
 
-    setState(() {
-      _imageFile = file;
-      _imageUrl = null;
-    });
-  }
+  //   setState(() {
+  //     _imageFile = file;
+  //     _imageUrl = null;
+  //   });
+  // }
 
   void _submit() {
     FocusScope.of(context).unfocus();

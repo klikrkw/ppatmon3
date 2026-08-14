@@ -79,5 +79,7 @@
     <string>This app needs access to the photo library to read QR codes.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>This app needs access to save photos.</string> 
+    <key>NSFaceIDUsageDescription</key>
+    <string>Gunakan Face ID untuk login ke aplikasi E-PPAT.</string>
 </dict>
 </plist>

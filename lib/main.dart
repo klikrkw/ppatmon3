@@ -20,6 +20,7 @@ import 'package:newklikrkw/blocs/theme/theme_bloc.dart';
 import 'package:newklikrkw/blocs/theme/theme_state.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_bloc.dart';
 import 'package:newklikrkw/core/theme/app_theme.dart';
+import 'package:newklikrkw/enums/login_method.dart';
 import 'package:newklikrkw/pages/login_page.dart';
 // import 'package:newklikrkw/core/theme/app_theme.dart';
 // import 'package:newklikrkw/models/product_model.dart';
@@ -48,6 +49,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:newklikrkw/services/bayarbiayaperm.dart';
 import 'package:newklikrkw/services/berkas_lokasi_service.dart';
 import 'package:newklikrkw/services/biayaperm_service.dart';
+import 'package:newklikrkw/services/biometric_service.dart';
 import 'package:newklikrkw/services/bukubesar_service.dart';
 import 'package:newklikrkw/services/catatanperm_service.dart';
 import 'package:newklikrkw/services/desa_service.dart';
@@ -198,9 +200,10 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         BlocProvider(
-          create: (context) =>
-              AuthBloc(authRepository: widget.authRepository)
-                ..add(AppStarted()),
+          create: (context) => AuthBloc(
+            authRepository: widget.authRepository,
+            biometricService: BiometricService(),
+          )..add(AppStarted()),
         ),
         BlocProvider(create: (_) => ThemeBloc()),
         BlocProvider(
@@ -257,25 +260,96 @@ class _MyAppState extends State<MyApp> {
 
             routes: routes,
 
-            home: BlocBuilder<AuthBloc, AuthState>(
-              builder: (context, state) {
-                if (state is Authenticated) {
-                  return const HomeScreen();
-                }
-
-                if (state is Unauthenticated || state is AuthFailure) {
-                  return const LoginPage();
-                }
-
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
+            home: BlocListener<AuthBloc, AuthState>(
+              listenWhen: (previous, current) {
+                return previous is! Authenticated && current is Authenticated;
               },
+
+              listener: (context, state) {
+                if (state is Authenticated &&
+                    state.loginMethod == LoginMethod.password) {
+                  _showEnableBiometricDialog(context);
+                }
+              },
+
+              child: BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  if (state is Authenticated) {
+                    return const HomeScreen();
+                  }
+
+                  if (state is Unauthenticated || state is AuthFailure) {
+                    return const LoginPage();
+                  }
+
+                  return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
+                },
+              ),
             ),
           );
         },
       ),
     );
     // );
+  }
+
+  Future<void> _showEnableBiometricDialog(BuildContext context) async {
+    final service = BiometricService();
+
+    // Jangan context.read<AuthRepository>()
+    // karena AuthRepository belum RepositoryProvider.
+    final authRepository = widget.authRepository;
+
+    final available = await service.isAvailable();
+
+    if (!available || !context.mounted) {
+      return;
+    }
+
+    final enrolled = await service.hasBiometrics();
+
+    if (!enrolled || !context.mounted) {
+      return;
+    }
+
+    final enabled = await authRepository.isBiometricEnabled();
+
+    if (enabled || !context.mounted) {
+      return;
+    }
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Aktifkan Login Biometrik?'),
+          content: const Text(
+            'Gunakan fingerprint atau Face ID '
+            'untuk login lebih cepat pada perangkat ini.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false);
+              },
+              child: const Text('Nanti'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true);
+              },
+              child: const Text('Aktifkan'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true && context.mounted) {
+      context.read<AuthBloc>().add(const EnableBiometricRequested());
+    }
   }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:newklikrkw/blocs/auth/auth.dart';
+import 'package:newklikrkw/enums/user_permission.dart';
 import 'package:newklikrkw/routes.dart';
 
 class LaporanScreen extends StatelessWidget {
@@ -12,50 +15,69 @@ class LaporanScreen extends StatelessWidget {
       child: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 400),
-          child: ListView(
-            children: [
-              _SingleSection(
-                title: "Biaya Permohonan",
+          child: BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              return ListView(
                 children: [
-                  _CustomListTile(
-                    title: "Daftar Biaya Permohonan",
-                    icon: CupertinoIcons.person,
-                    onTap: () {
-                      Navigator.pushNamed(context, MyRoute.biayapermList.name);
-                    },
+                  _SingleSection(
+                    title: "Biaya Permohonan",
+                    children: [
+                      _CustomListTile(
+                        title: "Daftar Biaya Permohonan",
+                        icon: CupertinoIcons.person,
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoute.biayapermList.name,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  _SingleSection(
+                    title: "Keuangan",
+                    children: [
+                      _CustomListTile(
+                        title: "Pengeluaran Umum",
+                        icon: Icons.account_balance_rounded,
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoute.dkeluarbiayaByItem.name,
+                          );
+                        },
+                      ),
+                      if (state is Authenticated &&
+                          state.user.hasPermissions(
+                            UserPermission.aksesKeuangan.value,
+                          ))
+                        _CustomListTile(
+                          title: "Buku Besar",
+                          icon: Icons.balance_rounded,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              MyRoute.bukubesar.name,
+                            );
+                          },
+                        ),
+
+                      if (state is Authenticated &&
+                          state.user.hasPermissions(
+                            UserPermission.aksesKeuangan.value,
+                          ))
+                        _CustomListTile(
+                          title: "Neraca",
+                          icon: Icons.balance_rounded,
+                          onTap: () {
+                            Navigator.pushNamed(context, MyRoute.neraca.name);
+                          },
+                        ),
+                    ],
                   ),
                 ],
-              ),
-              _SingleSection(
-                title: "Keuangan",
-                children: [
-                  _CustomListTile(
-                    title: "Pengeluaran Umum",
-                    icon: Icons.account_balance_rounded,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        MyRoute.dkeluarbiayaByItem.name,
-                      );
-                    },
-                  ),
-                  _CustomListTile(
-                    title: "Buku Besar",
-                    icon: Icons.account_balance_rounded,
-                    onTap: () {
-                      Navigator.pushNamed(context, MyRoute.bukubesar.name);
-                    },
-                  ),
-                  _CustomListTile(
-                    title: "Neraca",
-                    icon: Icons.balance_rounded,
-                    onTap: () {
-                      Navigator.pushNamed(context, MyRoute.neraca.name);
-                    },
-                  ),
-                ],
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),

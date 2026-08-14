@@ -27,7 +27,10 @@ class PostingjurnalService {
         },
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
       return PostingjurnalResponse.fromJson(response.data);
@@ -45,7 +48,10 @@ class PostingjurnalService {
         '/lapkeuangans/akuns',
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
     } on DioException catch (e) {
@@ -63,7 +69,10 @@ class PostingjurnalService {
         data: data,
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
     } on DioException catch (e) {
@@ -82,7 +91,10 @@ class PostingjurnalService {
         // queryParameters: {'_method': 'POST'},
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
     } on DioException catch (e) {
@@ -99,7 +111,10 @@ class PostingjurnalService {
         '/postingjurnals/$id/delete',
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
     } on DioException catch (e) {

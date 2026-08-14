@@ -80,18 +80,37 @@ class AccountSettings extends StatelessWidget {
                       title: 'Sign Out',
                       subtitle: 'Sign out from all devices',
                       isDark: isDark,
-                      onTap: () {
-                        context.read<AuthBloc>().add(LogoutRequested());
+                      onTap: () async {
+                        final result = await showDialog<bool>(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Logout'),
+                              content: const Text(
+                                'Apakah Anda yakin ingin logout?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  child: const Text('Batal'),
+                                ),
+                                FilledButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  child: const Text('Logout'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (result == true && context.mounted) {
+                          context.read<AuthBloc>().add(const LogoutRequested());
+                        }
                       },
-                    ),
-                    _buildSettingTile(
-                      context,
-                      icon: Icons.delete_forever,
-                      title: 'Delete Account',
-                      subtitle: 'Permanently delete your account',
-                      isDark: isDark,
-                      textColor: Colors.red,
-                      onTap: () {},
                     ),
                   ],
                 ),

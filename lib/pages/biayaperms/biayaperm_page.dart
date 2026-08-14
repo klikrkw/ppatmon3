@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newklikrkw/blocs/auth/auth.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_bloc.dart';
 import 'package:newklikrkw/blocs/transpermohonan/transpermohonan_state.dart';
+import 'package:newklikrkw/enums/user_permission.dart';
 import 'package:newklikrkw/models/transpermohonan.dart';
 import 'package:newklikrkw/repositories/transpermohonan_repository.dart';
 import 'package:newklikrkw/services/trans_permohonan_service.dart';
@@ -70,6 +71,7 @@ class _BiayapermPageState extends State<BiayapermPage> {
                 transpermohonanId: _selectedTranspermohonanId,
               ),
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -77,7 +79,10 @@ class _BiayapermPageState extends State<BiayapermPage> {
           BlocBuilder<TranspermohonanBloc, TranspermohonanState>(
             builder: (context, state) {
               if (state.item == null) return const SizedBox.shrink();
-              if (user!.isAdmin == false) return const SizedBox.shrink();
+              if (user!.hasPermissions(UserPermission.aksesBiaya.value) ==
+                  false) {
+                return const SizedBox.shrink();
+              }
               return FloatingActionButton(
                 onPressed: () async {
                   await AddEditBiayapermDialog.show(

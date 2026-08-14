@@ -1,16 +1,33 @@
 part of 'auth_bloc.dart';
 
-@immutable
 sealed class AuthEvent {
   const AuthEvent();
 }
 
-final class AppStarted extends AuthEvent {}
+final class AppStarted extends AuthEvent {
+  const AppStarted();
+}
 
 final class LoginRequested extends AuthEvent {
   final String email;
   final String password;
-  const LoginRequested(this.email, this.password);
+  final bool rememberMe;
+
+  const LoginRequested(this.email, this.password, {this.rememberMe = false});
 }
 
-final class LogoutRequested extends AuthEvent {}
+final class BiometricLoginRequested extends AuthEvent {
+  const BiometricLoginRequested();
+}
+
+final class EnableBiometricRequested extends AuthEvent {
+  const EnableBiometricRequested();
+}
+
+final class DisableBiometricRequested extends AuthEvent {
+  const DisableBiometricRequested();
+}
+
+final class LogoutRequested extends AuthEvent {
+  const LogoutRequested();
+}

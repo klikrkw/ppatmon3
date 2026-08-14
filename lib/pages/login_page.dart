@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newklikrkw/blocs/auth/auth.dart';
+import 'package:newklikrkw/enums/login_method.dart';
+import 'package:newklikrkw/repositories/auth_repository.dart';
+import 'package:newklikrkw/services/biometric_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+  // bool _showBiometricPrompt = true;
 
   @override
   void dispose() {
@@ -37,14 +41,25 @@ class _LoginPageState extends State<LoginPage> {
 
       body: SafeArea(
         child: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthFailure) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.error)));
+          // listenWhen: (previous, current) {
+          //   return previous is! Authenticated && current is Authenticated;
+          // },
+          listener: (context, state) async {
+            // if (state is Authenticated) {
+            //   if (!_showBiometricPrompt) {
+            //     return;
+            //   }
+
+            //   _showBiometricPrompt = false;
+
+            //   await _showEnableBiometricDialog();
+            // }
+            if (state is Authenticated &&
+                state.loginMethod == LoginMethod.password) {
+              print('state sekarang: $state');
+              _showEnableBiometricDialog();
             }
           },
-
           builder: (context, state) {
             return LayoutBuilder(
               builder: (context, constraints) {
@@ -311,6 +326,34 @@ class _LoginPageState extends State<LoginPage> {
 
                                 const SizedBox(height: 20),
 
+                                // const SizedBox(height: 12),
+                                if (state is Unauthenticated &&
+                                    state.biometricAvailable &&
+                                    state.biometricEnabled)
+                                  Column(
+                                    children: [
+                                      const SizedBox(height: 12),
+
+                                      SizedBox(
+                                        width: double.infinity,
+                                        height: 48,
+                                        child: OutlinedButton.icon(
+                                          onPressed: () {
+                                            context.read<AuthBloc>().add(
+                                              const BiometricLoginRequested(),
+                                            );
+                                          },
+                                          icon: const Icon(
+                                            Icons.fingerprint,
+                                            size: 28,
+                                          ),
+                                          label: const Text(
+                                            'Login dengan Biometrik',
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 Text(
                                   "E-PPAT",
                                   textAlign: TextAlign.center,
@@ -344,7 +387,126 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     context.read<AuthBloc>().add(
-      LoginRequested(_emailController.text.trim(), _passwordController.text),
+      LoginRequested(
+        _emailController.text.trim(),
+        _passwordController.text,
+        rememberMe: _rememberMe,
+      ),
     );
+  }
+
+  // Future<bool> _biometricAvailable() async {
+  //   final service = BiometricService();
+
+  //   final supported = await service.isAvailable();
+
+  //   if (!supported) {
+  //     return false;
+  //   }
+
+  //   return service.hasBiometrics();
+  // }
+
+  // void _loginBiometric() {
+  //   FocusScope.of(context).unfocus();
+
+  //   context.read<AuthBloc>().add(const BiometricLoginRequested());
+  // }
+
+  // Future<void> _askEnableBiometric() async {
+  //   final service = BiometricService();
+
+  //   final available = await service.isAvailable();
+
+  //   if (!available) return;
+
+  //   final enrolled = await service.hasBiometrics();
+
+  //   if (!enrolled) return;
+
+  //   if (!mounted) return;
+
+  //   final result = await showDialog<bool>(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: const Text('Aktifkan Login Biometrik?'),
+  //         content: const Text(
+  //           'Gunakan fingerprint atau Face ID '
+  //           'untuk login lebih cepat pada perangkat ini.',
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.pop(context, false);
+  //             },
+  //             child: const Text('Nanti'),
+  //           ),
+  //           FilledButton(
+  //             onPressed: () {
+  //               Navigator.pop(context, true);
+  //             },
+  //             child: const Text('Aktifkan'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+
+  //   if (result == true && mounted) {
+  //     context.read<AuthBloc>().add(const EnableBiometricRequested());
+  //   }
+  // }
+  Future<void> _showEnableBiometricDialog() async {
+    final service = BiometricService();
+
+    final available = await service.isAvailable();
+    if (!available || !mounted) {
+      return;
+    }
+
+    final enrolled = await service.hasBiometrics();
+
+    if (!enrolled || !mounted) {
+      return;
+    }
+
+    final enabled = await context.read<AuthRepository>().isBiometricEnabled();
+
+    if (enabled || !mounted) {
+      return;
+    }
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Aktifkan Login Biometrik?'),
+          content: const Text(
+            'Gunakan fingerprint atau Face ID '
+            'untuk login lebih cepat pada perangkat ini.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text('Nanti'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text('Aktifkan'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true && mounted) {
+      context.read<AuthBloc>().add(const EnableBiometricRequested());
+    }
   }
 }

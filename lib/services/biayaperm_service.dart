@@ -3,6 +3,7 @@ import 'package:newklikrkw/blocs/biayaperm/biayaperm_bloc.dart';
 import 'package:newklikrkw/models/add_biayaperm_request.dart';
 import 'package:newklikrkw/models/biayaperm.dart';
 import 'package:newklikrkw/models/rincianbiayaperm.dart';
+import 'package:newklikrkw/models/validation_error.dart';
 import 'package:newklikrkw/utils/auth.dart';
 import 'package:newklikrkw/utils/dio.dart';
 
@@ -29,7 +30,10 @@ class BiayapermService {
         },
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
 
@@ -55,7 +59,10 @@ class BiayapermService {
         queryParameters: {'transpermohonan_id': transpermohonanId},
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
       return (response.data['data'] as List)
@@ -78,7 +85,10 @@ class BiayapermService {
         // queryParameters: {'biayaperm_id': biayapermId},
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
       return Biayaperm.fromJson(response.data['data']);
@@ -128,11 +138,11 @@ class BiayapermService {
         ),
       );
     } on DioException catch (e) {
-      throw Exception(
-        e.response?.data.toString() ??
-            e.message ??
-            'Gagal mengambil store biayaperm',
-      );
+      if (e.response?.statusCode == 422) {
+        throw ValidationError.fromJson(e.response?.data);
+      }
+
+      rethrow;
     }
   }
 
@@ -160,11 +170,28 @@ class BiayapermService {
           filename: request.imageFile!.path.split("/").last,
         ),
     });
+    try {
+      String? token = await getToken();
 
-    await dio.post(
-      "/biayaperm/$id",
-      data: formData,
-      options: Options(method: "PUT", contentType: "multipart/form-data"),
-    );
+      await dio.post(
+        "/biayaperm/$id",
+        data: formData,
+        options: Options(
+          method: "PUT",
+          contentType: "multipart/form-data",
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 422) {
+        throw ValidationError.fromJson(e.response?.data);
+      }
+
+      rethrow;
+    }
   }
 }

@@ -19,7 +19,10 @@ class TranspermohonanService {
         '/transpermohonans/list',
         queryParameters: {'search': keyword, 'user_id': ?userId},
         options: Options(
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
           responseType: ResponseType.json,
         ),
       );
@@ -57,7 +60,10 @@ class TranspermohonanService {
           'is_transpermohonan_id': ?isTranspermohonanId,
         },
         options: Options(
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
           responseType: ResponseType.json,
         ),
       );
@@ -77,7 +83,10 @@ class TranspermohonanService {
       '/transpermohonans/permohonan/status/$id/update',
       data: {'active': active},
       options: Options(
-        headers: {'Authorization': 'Bearer $token'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
         responseType: ResponseType.json,
       ),
     );
@@ -91,11 +100,13 @@ class TranspermohonanService {
         data: request.toJson(),
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
     } on DioException catch (e) {
-      print(e.response?.data);
       throw DioExceptionParser.parse(e);
     }
   }
@@ -108,7 +119,10 @@ class TranspermohonanService {
         data: request.toJson(),
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
     } on DioException catch (e) {
@@ -127,7 +141,10 @@ class TranspermohonanService {
         "/permohonans/transpermohonan/$id/show",
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
       return TranspermohonanModel.fromJson(response.data["data"]);

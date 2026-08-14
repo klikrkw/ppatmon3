@@ -49,7 +49,10 @@ class CatatanpermService {
         queryParameters: queryParameters,
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
       return CatatanpermResponse.fromJson(response.data);
@@ -75,7 +78,10 @@ class CatatanpermService {
         '/catatanperms/fieldcatatans',
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
 
@@ -102,7 +108,10 @@ class CatatanpermService {
         data: formData,
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
       return Catatanperm.fromJson(response.data['data']);
@@ -123,14 +132,15 @@ class CatatanpermService {
         data: formData,
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
 
       return Catatanperm.fromJson(response.data['data']);
     } on DioException catch (e) {
-      print('error : $e');
-
       throw Exception(
         e.response?.data.toString() ?? e.message ?? 'Gagal mengambil data',
       );
@@ -144,7 +154,10 @@ class CatatanpermService {
         '/catatanperms/$id/delete',
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
     } on DioException catch (e) {
@@ -161,7 +174,6 @@ class CatatanpermService {
       'transpermohonan_id': request.transpermohonanId,
       'user_id': request.userId,
     };
-
     if (request.imageFile != null) {
       data['image_file'] = await MultipartFile.fromFile(
         request.imageFile!.path,

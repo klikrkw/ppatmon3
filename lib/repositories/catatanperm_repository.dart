@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:newklikrkw/models/catatanperm.dart';
 import 'package:newklikrkw/models/catatanperm_response.dart';
 import 'package:newklikrkw/models/fieldcatatan.dart';
@@ -33,7 +35,7 @@ class CatatanpermRepository {
     return service.getFieldcatatans();
   }
 
-  Future<Catatanperm> add(AddEditCatatanpermRequest request) {
+  Future<void> add(AddEditCatatanpermRequest request) {
     return service.add(request);
   }
 

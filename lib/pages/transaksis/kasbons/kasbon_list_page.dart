@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newklikrkw/blocs/auth/auth.dart';
 import 'package:newklikrkw/blocs/kasbon/kasbon_bloc.dart';
+import 'package:newklikrkw/enums/user_permission.dart';
 import 'package:newklikrkw/models/db_option.dart';
 import 'package:newklikrkw/models/kasbon.dart';
 import 'package:newklikrkw/pages/transaksis/kasbons/edit_kasbon_page.dart';
@@ -461,7 +462,10 @@ class _KasbonListPageState extends State<KasbonListPage> {
                     SizedBox(height: 10),
                   ],
                 ),
-                onTap: () => user!.isAdmin == true
+                onTap: () =>
+                    user!.hasPermissions(
+                      UserPermission.updateStatusKasbon.value,
+                    )
                     ? _showUpdateStatusBottomSheet(kasbon)
                     : null,
               ),
@@ -523,14 +527,16 @@ class _KasbonListPageState extends State<KasbonListPage> {
       floatingActionButton: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           if (state is Authenticated) {
-            return FloatingActionButton(
-              child: const Icon(Icons.add),
-              onPressed: () {
-                final user = state.user;
-                context.read<KasbonBloc>().add(NewKasbon(userId: user.id));
-                Navigator.pushNamed(context, MyRoute.addKasbon.name);
-              },
-            );
+            if (!state.user.hasPermissions(UserPermission.aksesKasbon.name)) {
+              return FloatingActionButton(
+                child: const Icon(Icons.add),
+                onPressed: () {
+                  final user = state.user;
+                  context.read<KasbonBloc>().add(NewKasbon(userId: user.id));
+                  Navigator.pushNamed(context, MyRoute.addKasbon.name);
+                },
+              );
+            }
           }
           return const SizedBox();
         },

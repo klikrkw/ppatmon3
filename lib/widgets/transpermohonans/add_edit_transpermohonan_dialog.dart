@@ -95,6 +95,7 @@ class _AddEditTranspermohonanDialogState
     if (isEdit) {
     } else {
       _kodeUnikController.text = '';
+      _bidangController.text = '1';
     }
   }
 

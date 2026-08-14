@@ -336,7 +336,7 @@ class _CatatanpermListBodyState extends State<_CatatanpermListBody> {
           return CatatanpermCard(
             item: item,
             index: index,
-            onTap: () {
+            onImageTap: () {
               if (item.hasImage) {
                 _showImage(item);
               }
@@ -352,6 +352,7 @@ class _CatatanpermListBodyState extends State<_CatatanpermListBody> {
                   ),
                 ),
               );
+              if (!mounted) return;
 
               if (result == true && context.mounted) {
                 context.read<CatatanpermBloc>().add(

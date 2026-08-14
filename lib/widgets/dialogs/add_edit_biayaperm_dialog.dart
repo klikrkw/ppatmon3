@@ -6,8 +6,9 @@ import 'package:newklikrkw/models/rincianbiayaperm.dart';
 import 'package:intl/intl.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'package:newklikrkw/models/add_biayaperm_request.dart';
+import 'package:newklikrkw/widgets/image_upload_widget.dart';
 // import 'package:newklikrkw/widgets/image_upload_widget.dart';
 
 final currency = NumberFormat.currency(
@@ -28,9 +29,12 @@ double _toDouble(TextEditingController controller) {
       0;
 }
 
-final ImagePicker _picker = ImagePicker();
+// final ImagePicker _picker = ImagePicker();
 
-XFile? _pickedImage;
+// XFile? _pickedImage;
+File? _imageFile;
+
+String? _oldImage;
 
 double _parseCurrency(String value) {
   return double.tryParse(
@@ -174,6 +178,7 @@ class _AddEditBiayapermDialogState extends State<AddEditBiayapermDialog> {
   //     }
   //   });
   // }
+  BiayapermBloc get bloc => context.read<BiayapermBloc>();
 
   void _fillFormNew(Rincianbiayaperm? item) {
     if (item != null) {
@@ -206,7 +211,8 @@ class _AddEditBiayapermDialogState extends State<AddEditBiayapermDialog> {
         // TODO: implement listener
         if (state.saveSuccess) {
           setState(() {
-            _pickedImage = null;
+            // _pickedImage = null;
+            _imageFile = null;
             _imagePath = null;
           });
 
@@ -440,6 +446,7 @@ class _AddEditBiayapermDialogState extends State<AddEditBiayapermDialog> {
                                     controller: _jumlahBayarController,
                                     keyboardType: TextInputType.number,
                                     inputFormatters: [_rupiahFormatter],
+                                    readOnly: _selectedRincian == null,
                                     decoration: InputDecoration(
                                       labelText: "Jumlah Bayar",
                                       prefixText: "Rp ",
@@ -559,110 +566,135 @@ class _AddEditBiayapermDialogState extends State<AddEditBiayapermDialog> {
                                   //     ),
                                   //   ),
                                   // SizedBox(height: 16),
-                                  Container(
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.grey.shade400,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        const SizedBox(height: 16),
+                                  // Container(
+                                  //   width: double.infinity,
+                                  //   decoration: BoxDecoration(
+                                  //     border: Border.all(
+                                  //       color: Colors.grey.shade400,
+                                  //     ),
+                                  //     borderRadius: BorderRadius.circular(12),
+                                  //   ),
+                                  //   child: Column(
+                                  //     children: [
+                                  //       const SizedBox(height: 16),
 
-                                        if (_pickedImage != null)
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            child: Image.file(
-                                              File(_pickedImage!.path),
-                                              height: 220,
-                                              width: double.infinity,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          )
-                                        else if ((_imagePath ?? "").isNotEmpty)
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            child: Image.network(
-                                              _imagePath!,
-                                              height: 220,
-                                              width: double.infinity,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          )
-                                        else
-                                          Container(
-                                            height: 220,
-                                            alignment: Alignment.center,
-                                            child: const Icon(
-                                              Icons.image,
-                                              size: 80,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
+                                  // if (_pickedImage != null)
+                                  //   ClipRRect(
+                                  //     borderRadius: BorderRadius.circular(
+                                  //       12,
+                                  //     ),
+                                  //     child: Image.file(
+                                  //       File(_pickedImage!.path),
+                                  //       height: 220,
+                                  //       width: double.infinity,
+                                  //       fit: BoxFit.cover,
+                                  //     ),
+                                  //   )
+                                  // else if ((_imagePath ?? "").isNotEmpty)
+                                  //   ClipRRect(
+                                  //     borderRadius: BorderRadius.circular(
+                                  //       12,
+                                  //     ),
+                                  //     child: Image.network(
+                                  //       _imagePath!,
+                                  //       height: 220,
+                                  //       width: double.infinity,
+                                  //       fit: BoxFit.cover,
+                                  //     ),
+                                  //   )
+                                  // else
+                                  //   Container(
+                                  //     height: 220,
+                                  //     alignment: Alignment.center,
+                                  //     child: const Icon(
+                                  //       Icons.image,
+                                  //       size: 80,
+                                  //       color: Colors.grey,
+                                  //     ),
+                                  //   ),
 
-                                        const SizedBox(height: 12),
+                                  // const SizedBox(height: 12),
 
-                                        Wrap(
-                                          spacing: 8,
-                                          children: [
-                                            FilledButton.icon(
-                                              onPressed: _pickFromCamera,
-                                              icon: const Icon(
-                                                Icons.camera_alt,
-                                              ),
-                                              label: const Text("Kamera"),
-                                            ),
+                                  // Wrap(
+                                  //   spacing: 8,
+                                  //   children: [
+                                  //     FilledButton.icon(
+                                  //       onPressed: _pickFromCamera,
+                                  //       icon: const Icon(
+                                  //         Icons.camera_alt,
+                                  //       ),
+                                  //       label: const Text("Kamera"),
+                                  //     ),
 
-                                            FilledButton.icon(
-                                              onPressed: _pickFromGallery,
-                                              icon: const Icon(Icons.photo),
-                                              label: const Text("Galeri"),
-                                            ),
+                                  //     FilledButton.icon(
+                                  //       onPressed: _pickFromGallery,
+                                  //       icon: const Icon(Icons.photo),
+                                  //       label: const Text("Galeri"),
+                                  //     ),
 
-                                            if (_pickedImage != null ||
-                                                (_imagePath ?? "").isNotEmpty)
-                                              OutlinedButton.icon(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _pickedImage = null;
-                                                    _imagePath = null;
-                                                  });
-                                                },
-                                                icon: const Icon(Icons.delete),
-                                                label: const Text("Hapus"),
-                                              ),
-                                          ],
-                                        ),
+                                  //     if (_pickedImage != null ||
+                                  //         (_imagePath ?? "").isNotEmpty)
+                                  //       OutlinedButton.icon(
+                                  //         onPressed: () {
+                                  //           setState(() {
+                                  //             _pickedImage = null;
+                                  //             _imagePath = null;
+                                  //           });
+                                  //         },
+                                  //         icon: const Icon(Icons.delete),
+                                  //         label: const Text("Hapus"),
+                                  //       ),
+                                  //   ],
+                                  // ),
 
-                                        if (state
-                                                .validationError
-                                                ?.errors["image_biayaperm"] !=
-                                            null)
-                                          Padding(
-                                            padding: const EdgeInsets.all(12),
-                                            child: Text(
-                                              state
-                                                  .validationError!
-                                                  .errors["image_biayaperm"]!
-                                                  .first,
-                                              style: const TextStyle(
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                          ),
+                                  // if (state
+                                  //         .validationError
+                                  //         ?.errors["image_biayaperm"] !=
+                                  //     null)
+                                  //   Padding(
+                                  //     padding: const EdgeInsets.all(12),
+                                  //     child: Text(
+                                  //       state
+                                  //           .validationError!
+                                  //           .errors["image_biayaperm"]!
+                                  //           .first,
+                                  //       style: const TextStyle(
+                                  //         color: Colors.red,
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  ImageUploadWidget(
+                                    imageFile: _imageFile,
 
-                                        const SizedBox(height: 16),
-                                      ],
-                                    ),
+                                    imageUrl: _oldImage,
+
+                                    folderName: 'biayaperm',
+
+                                    maxSizeInMB: 1,
+
+                                    onChanged: (file) {
+                                      setState(() {
+                                        _imageFile = file;
+                                      });
+
+                                      bloc.add(ResetValidationError());
+                                    },
+
+                                    onRemove: () {
+                                      setState(() {
+                                        _imageFile = null;
+                                        _oldImage = null;
+                                      });
+
+                                      bloc.add(ResetValidationError());
+                                    },
                                   ),
-                                  const SizedBox(height: 32),
+                                  const SizedBox(height: 16),
                                 ],
+                                // ),
+                                // ),
+                                // const SizedBox(height: 32),
+                                // ],
                               );
                             },
                           ),
@@ -722,7 +754,8 @@ class _AddEditBiayapermDialogState extends State<AddEditBiayapermDialog> {
 
       catatanBiayaperm: _catatanController.text.trim(),
 
-      imageFile: _pickedImage == null ? null : File(_pickedImage!.path),
+      // imageFile: _pickedImage == null ? null : File(_pickedImage!.path),
+      imageFile: _imageFile,
 
       imageUrl: _imagePath,
     );
@@ -749,31 +782,31 @@ class _AddEditBiayapermDialogState extends State<AddEditBiayapermDialog> {
     );
   }
 
-  Future<void> _pickFromCamera() async {
-    final image = await _picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 80,
-    );
+  // Future<void> _pickFromCamera() async {
+  //   final image = await _picker.pickImage(
+  //     source: ImageSource.camera,
+  //     imageQuality: 80,
+  //   );
 
-    if (image == null) return;
+  //   if (image == null) return;
 
-    setState(() {
-      _pickedImage = image;
-      _imagePath = null;
-    });
-  }
+  //   setState(() {
+  //     _pickedImage = image;
+  //     _imagePath = null;
+  //   });
+  // }
 
-  Future<void> _pickFromGallery() async {
-    final image = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
+  // Future<void> _pickFromGallery() async {
+  //   final image = await _picker.pickImage(
+  //     source: ImageSource.gallery,
+  //     imageQuality: 80,
+  //   );
 
-    if (image == null) return;
+  //   if (image == null) return;
 
-    setState(() {
-      _pickedImage = image;
-      _imagePath = null;
-    });
-  }
+  //   setState(() {
+  //     _pickedImage = image;
+  //     _imagePath = null;
+  //   });
+  // }
 }

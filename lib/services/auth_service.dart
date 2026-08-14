@@ -21,12 +21,14 @@ class AuthService {
         data: {'email': email, 'password': password},
         options: Options(responseType: ResponseType.json),
       );
-
       return response.data;
     } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionError) {
+        throw Exception('Network is unreachable');
+      }
       // return e.response?.data;
       throw Exception(
-        e.response?.data['message'] ?? 'Gagal terhubung ke server',
+        e.response?.data['message'] ?? 'Error, Gagal terhubung ke server',
       );
     }
   }
@@ -72,6 +74,20 @@ class AuthService {
       );
     } catch (e) {
       throw Exception('Gagal logout dari server');
+    }
+  }
+
+  Future<Map<String, dynamic>> refreshToken(String refreshToken) async {
+    // print('refresh token : $refreshToken ');
+    try {
+      final response = await dio.post(
+        '/refresh',
+        data: {'refresh_token': refreshToken},
+      );
+      return Map<String, dynamic>.from(response.data);
+    } on DioException catch (e) {
+      // print(e.response?.data);
+      throw ApiException(e.response?.data['message']);
     }
   }
 }

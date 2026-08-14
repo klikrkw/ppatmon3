@@ -9,7 +9,7 @@ class Catatanperm {
   final Fieldcatatan? fieldcatatan;
   final String isiCatatanperm;
   final String transpermohonanId;
-  final String? imageCatatanperm;
+  final String imageCatatanperm;
 
   final User? user;
 
@@ -19,7 +19,7 @@ class Catatanperm {
     this.updatedAt,
     this.fieldcatatan,
     required this.isiCatatanperm,
-    this.imageCatatanperm,
+    required this.imageCatatanperm,
     this.user,
     required this.transpermohonanId,
   });
@@ -37,10 +37,10 @@ class Catatanperm {
           ? Fieldcatatan.fromJson(json['fieldcatatan'])
           : null,
       isiCatatanperm: json['isi_catatanperm'] ?? '',
-      imageCatatanperm: json['image_catatanperm'],
+      imageCatatanperm: json['image_catatanperm'] ?? '',
       user: json['user'] != null ? User.fromJson(json['user']) : null,
       transpermohonanId: json['transpermohonan_id'] ?? '',
     );
   }
-  bool get hasImage => imageCatatanperm != null;
+  bool get hasImage => imageCatatanperm.isNotEmpty;
 }

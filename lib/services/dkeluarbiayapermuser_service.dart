@@ -32,7 +32,10 @@ class DkeluarbiayapermuserService {
         },
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
 
@@ -69,7 +72,10 @@ class DkeluarbiayapermuserService {
         queryParameters: {"instansi_id": ?instansiId},
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
 
@@ -92,7 +98,10 @@ class DkeluarbiayapermuserService {
         "/keluarbiayapermusers/$keluarbiayapermuserId/show",
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
 
@@ -131,7 +140,10 @@ class DkeluarbiayapermuserService {
         data: formData,
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
     } on DioException catch (e) {
@@ -184,7 +196,10 @@ class DkeluarbiayapermuserService {
         data: {"status_keluarbiayapermuser": status},
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
     } on DioException catch (e) {
@@ -204,7 +219,10 @@ class DkeluarbiayapermuserService {
         "/dkeluarbiayapermusers/$id",
         options: Options(
           responseType: ResponseType.json,
-          headers: {'Authorization': 'Bearer $token'},
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
         ),
       );
     } on DioException catch (e) {

@@ -1,4 +1,4 @@
-import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class AddBayarbiayapermRequest {
   final String biayapermId;
@@ -16,7 +16,7 @@ class AddBayarbiayapermRequest {
   final String catatanBayarbiayaperm;
 
   /// Gambar baru yang dipilih dari galeri/kamera
-  final XFile? imageFile;
+  final File? imageFile;
 
   /// URL/path gambar lama (dipakai saat edit)
   final String? imageUrl;
@@ -43,7 +43,7 @@ class AddBayarbiayapermRequest {
     double? jumlahBayar,
     double? saldoAkhir,
     String? catatanBayarbiayaperm,
-    XFile? imageFile,
+    File? imageFile,
     String? imageUrl,
   }) {
     return AddBayarbiayapermRequest(

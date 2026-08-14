@@ -10,6 +10,7 @@ class PostingjurnalCard extends StatelessWidget {
   final int index;
 
   final VoidCallback? onTap;
+  final VoidCallback? onImageTap;
 
   final VoidCallback? onEdit;
 
@@ -22,6 +23,7 @@ class PostingjurnalCard extends StatelessWidget {
     this.onTap,
     this.onEdit,
     this.onDelete,
+    this.onImageTap,
   });
 
   @override
@@ -53,22 +55,25 @@ class PostingjurnalCard extends StatelessWidget {
               ///==========================
               /// IMAGE
               ///==========================
-              Container(
-                width: 60,
-                height: 60,
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
+              InkWell(
+                onTap: onImageTap,
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: item.hasImage
+                      ? Image.network(
+                          "$myBaseUrl${item.image}",
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) =>
+                              const Icon(Icons.image_not_supported),
+                        )
+                      : const Icon(Icons.receipt_long, size: 32),
                 ),
-                child: item.hasImage
-                    ? Image.network(
-                        "$myBaseUrl${item.image}",
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) =>
-                            const Icon(Icons.image_not_supported),
-                      )
-                    : const Icon(Icons.receipt_long, size: 32),
               ),
 
               const SizedBox(width: 12),

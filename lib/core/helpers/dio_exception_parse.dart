@@ -11,6 +11,13 @@ class DioExceptionParser {
         return ValidationException(ValidationError.fromJson(data));
       }
     }
+    if (e.response?.statusCode == 303) {
+      final data = e.response?.data;
+
+      if (data is Map<String, dynamic>) {
+        return ValidationException(ValidationError.fromJson(data));
+      }
+    }
 
     if (e.type == DioExceptionType.connectionTimeout) {
       return Exception('Connection timeout');
